@@ -9,5 +9,5 @@ CS 3110 Spring 2021 Final Project
 ********************************************)
 
 
-(** [hours_worked] is the number of hours you worked on this assignment. *)
+(** [hours_worked] is the number of hours the group worked in total. *)
 val hours_worked : int
