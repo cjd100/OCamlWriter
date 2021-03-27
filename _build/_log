@@ -8,7 +8,7 @@ ocamlfind ocamlc -c -g -o file.cmi file.mli # cached
 # Target: gui.mli.depends, tags: { debug, extension:mli, file:gui.mli, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -modules gui.mli > gui.mli.depends # cached
 # Target: gui.cmi, tags: { byte, compile, debug, extension:mli, file:gui.mli, interf, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -g -o gui.cmi gui.mli # cached
+ocamlfind ocamlc -c -g -o gui.cmi gui.mli
 # Target: test.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:test.cmo, file:test.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -g -o test.cmo test.ml
 + ocamlfind ocamlc -c -g -o test.cmo test.ml
