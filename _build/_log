@@ -1,16 +1,21 @@
 ### Starting build.
-# Target: gui.mli.depends, tags: { extension:mli, file:gui.mli, ocaml, ocamldep, quiet, traverse }
+# Target: test.ml.depends, tags: { debug, extension:ml, file:test.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -modules test.ml > test.ml.depends # cached
+# Target: file.mli.depends, tags: { debug, extension:mli, file:file.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -modules file.mli > file.mli.depends # cached
+# Target: file.cmi, tags: { byte, compile, debug, extension:mli, file:file.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -g -o file.cmi file.mli # cached
+# Target: gui.mli.depends, tags: { debug, extension:mli, file:gui.mli, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -modules gui.mli > gui.mli.depends # cached
-# Target: gui.cmi, tags: { byte, compile, extension:mli, file:gui.mli, interf, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -o gui.cmi gui.mli # cached
-# Target: gui.ml.depends, tags: { extension:ml, file:gui.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules gui.ml > gui.ml.depends # cached
-# Target: gui.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:gui.cmo, file:gui.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -o gui.cmo gui.ml
-+ ocamlfind ocamlc -c -o gui.cmo gui.ml
-File "gui.ml", line 1, characters 5-10:
-1 | open GMain
-         ^^^^^
-Error: Unbound module GMain
+# Target: gui.cmi, tags: { byte, compile, debug, extension:mli, file:gui.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -g -o gui.cmi gui.mli # cached
+# Target: test.cmo, tags: { byte, compile, debug, extension:cmo, extension:ml, file:test.cmo, file:test.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -g -o test.cmo test.ml
++ ocamlfind ocamlc -c -g -o test.cmo test.ml
+File "test.ml", line 1, characters 5-11:
+1 | open OUnit2
+         ^^^^^^
+Error: Unbound module OUnit2
+Hint: Did you mean Unit?
 Command exited with code 2.
 # Compilation unsuccessful.
