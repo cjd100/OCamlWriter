@@ -1,0 +1,6 @@
+#require "ounit2";;
+#require "lablgtk2";;
+#require "Core";;
+#load "gui.cmo";;
+#load "file.cmo"
+
