@@ -4,8 +4,7 @@ MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
 TEST=test.byte
 MAIN=gui.byte
-#OCAMLBUILD=ocamlbuild -use-ocamlfind -r 
-OCAMLBUILD = ocamlfind ocamlc -g 
+OCAMLBUILD=ocamlbuild -use-ocamlfind -r 
 
 default: build 
 	OCAMLRUNPARAM=b utop
