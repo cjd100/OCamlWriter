@@ -67,10 +67,9 @@ let main () =
     GText.view ~packing:text_scroll#add_with_viewport ()
   in
 
-  (* Modifies the background color to [color] and the text color to
-     [text] *)
-  let theme color text =
-    text_field#misc#modify_base [ (`NORMAL, color) ];
+  (* Modifies the background color to [bg] and the text color to [text] *)
+  let theme bg text =
+    text_field#misc#modify_base [ (`NORMAL, bg) ];
     text_field#misc#modify_text [ (`NORMAL, text) ]
   in
 
