@@ -61,9 +61,17 @@ let main () =
     GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
       ~packing:container#add ()
   in
+
   (* Main text widget *)
   let text_field =
     GText.view ~packing:text_scroll#add_with_viewport ()
+  in
+
+  (* Modifies the background color to [color] and the text color to
+     [text] *)
+  let theme color text =
+    text_field#misc#modify_base [ (`NORMAL, color) ];
+    text_field#misc#modify_text [ (`NORMAL, text) ]
   in
 
   (* File menu *)
@@ -80,10 +88,9 @@ let main () =
   (* TODO: Create theme names and add a callback function that changes
      colors*)
   let factory = new GMenu.factory theme_menu ~accel_group in
-  factory#add_item "Theme name 1" ~callback:(fun () ->
-      failwith "unimplemented");
-  factory#add_item "Theme name 2" ~callback:(fun () ->
-      failwith "unimplemented");
+  factory#add_item "Dark Mode" ~callback:(fun () -> theme `BLACK `WHITE);
+  factory#add_item "Light Mode" ~callback:(fun () ->
+      theme `WHITE `BLACK);
   factory#add_item "Custom Theme" ~callback:(fun () ->
       failwith "unimplemented");
 
