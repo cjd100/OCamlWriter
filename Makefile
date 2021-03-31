@@ -4,7 +4,9 @@ MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
 TEST=test.byte
 MAIN=gui.byte
-OCAMLBUILD=ocamlbuild -use-ocamlfind -r 
+OCAMLBUILD=ocamlbuild -use-ocamlfind -r
+PTHREAD_LIBS=@PTHREAD_LIBS@
+PTHREAD_CAML_LIBS=$(addprefix -cclib ,$(PTHREAD_LIBS))
 
 default: build 
 	OCAMLRUNPARAM=b utop
@@ -42,3 +44,6 @@ docs-private: build
 	ocamlfind ocamldoc -I _build -package core,lablgtk2 \
 		-html -stars -d _doc.private \
 		-inv-merge-ml-mli -m A $(MLIS) $(MLS)
+
+zip:
+	zip text_editor.zip *.ml* *.json *.sh *.md *.txt _tags .merlin .ocamlformat .ocamlinit Makefile	
