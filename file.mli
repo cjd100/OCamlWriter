@@ -9,7 +9,7 @@ type filename = string
 
 (** [open_to_string filename] creates a list of strings that represents
     a text file that has the name [filename]*)
-val open_to_string : string -> string list
+val open_to_string : string -> string
 
 (** [create_file_type filename] creates a value of type f that
     represents the file with name [filename] and text [contents]*)
