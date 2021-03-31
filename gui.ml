@@ -37,45 +37,89 @@ let load_file parent =
   end;
   open_file_window#destroy ()
 
-let dialog_ref = ref None
+(** A reference to the mutable palette dialogue *)
+let bg_dialog_ref = ref None
 
-let color = ref (`RGB (0, 65535, 0)) (* GDraw.color ref type *)
+(** The color of the background broken up into RGB values *)
+let bg_color = ref (`RGB (0, 0, 0))
 
-let response dlg textarea resp =
-  let colorsel = dlg#colorsel in
+(** Matches the feedback from the [dialogue] palette, and modifies the
+    background of [textarea] accordingly *)
+let background_response dialogue textarea resp =
+  let colorsel = dialogue#colorsel in
   begin
     match resp with
-    | `OK -> color := `COLOR colorsel#color
+    | `OK -> bg_color := `COLOR colorsel#color
     | _ -> ()
   end;
-  textarea#misc#modify_base [ (`NORMAL, !color) ];
-  dlg#misc#hide ()
+  textarea#misc#modify_base [ (`NORMAL, !bg_color) ];
+  dialogue#misc#hide ()
 
-(* Drawingarea button_press event handler *)
-let button_pressed textarea =
-  (* Create color selection dialog *)
+(* Opens the color palette and outputs changes in color for modification
+   of the [textarea] background *)
+let background_color_change textarea =
   let colordlg =
-    match !dialog_ref with
+    match !bg_dialog_ref with
     | None ->
         let dlg =
           GWindow.color_selection_dialog
-            ~title:"Select background color" ()
+            ~title:"Select Background Color" ()
         in
-        dialog_ref := Some dlg;
+        bg_dialog_ref := Some dlg;
         dlg
     | Some dlg -> dlg
   in
 
-  (* Get the ColorSelection widget *)
   let colorsel = colordlg#colorsel in
 
-  colorsel#set_color (GDraw.color !color);
-  (* requires Gdk.color type *)
+  colorsel#set_color (GDraw.color !bg_color);
   colorsel#set_has_palette true;
 
-  colordlg#connect#response ~callback:(response colordlg textarea);
+  colordlg#connect#response
+    ~callback:(background_response colordlg textarea);
 
-  (* Show the dialog *)
+  colordlg#run ();
+  ()
+
+(** A reference to the mutable palette dialogue *)
+let text_dialog_ref = ref None
+
+(** The color of the background broken up into RGB values *)
+let text_color = ref (`RGB (0, 0, 0))
+
+(** Matches the feedback from the [dialogue] palette, and modifies the
+    text of [textarea] accordingly *)
+let text_response dialogue textarea resp =
+  let colorsel = dialogue#colorsel in
+  begin
+    match resp with
+    | `OK -> text_color := `COLOR colorsel#color
+    | _ -> ()
+  end;
+  textarea#misc#modify_text [ (`NORMAL, !text_color) ];
+  dialogue#misc#hide ()
+
+(* Opens the color palette and outputs changes in color for modification
+   of the [textarea] text *)
+let text_color_change textarea =
+  let colordlg =
+    match !text_dialog_ref with
+    | None ->
+        let dlg =
+          GWindow.color_selection_dialog ~title:"Select Text Color" ()
+        in
+        text_dialog_ref := Some dlg;
+        dlg
+    | Some dlg -> dlg
+  in
+
+  let colorsel = colordlg#colorsel in
+
+  colorsel#set_color (GDraw.color !text_color);
+  colorsel#set_has_palette true;
+
+  colordlg#connect#response ~callback:(text_response colordlg textarea);
+
   colordlg#run ();
   ()
 
@@ -110,7 +154,7 @@ let main () =
   in
 
   (* Modifies the background color to [bg] and the text color to [text] *)
-  let theme bg text =
+  let preset_theme bg text =
     text_field#misc#modify_base [ (`NORMAL, bg) ];
     text_field#misc#modify_text [ (`NORMAL, text) ]
   in
@@ -126,14 +170,15 @@ let main () =
   factory#add_item "Quit" ~key:_Q ~callback:Main.quit;
 
   (* Theme menu *)
-  (* TODO: Create theme names and add a callback function that changes
-     colors*)
   let factory = new GMenu.factory theme_menu ~accel_group in
-  factory#add_item "Dark Mode" ~callback:(fun () -> theme `BLACK `WHITE);
+  factory#add_item "Dark Mode" ~callback:(fun () ->
+      preset_theme `BLACK `WHITE);
   factory#add_item "Light Mode" ~callback:(fun () ->
-      theme `WHITE `BLACK);
-  factory#add_item "Custom Theme" ~callback:(fun () ->
-      button_pressed text_field);
+      preset_theme `WHITE `BLACK);
+  factory#add_item "Custom Background" ~callback:(fun () ->
+      background_color_change text_field);
+  factory#add_item "Custom Text Color" ~callback:(fun () ->
+      text_color_change text_field);
 
   (* Displays the main window and continues the main loop, this should
      always be the last part *)
