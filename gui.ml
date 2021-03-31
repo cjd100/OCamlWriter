@@ -1,5 +1,6 @@
 open GMain
 open GdkKeysyms
+open File
 
 (* Initializes Gtk *)
 let init = GtkMain.Main.init ()
@@ -17,7 +18,7 @@ let insert_text text field = field#buffer#set_text text
 (** [load_file parent] opens up a new window, with the parent window
     [parent]. The new window is a file selection GUI that loads the
     selected file into the document. *)
-let load_file parent =
+let load_file parent text_field =
   let get_filename = function Some f -> f | None -> "" in
   (* window that appears when the request file command is issued*)
   let open_file_window =
@@ -30,8 +31,11 @@ let load_file parent =
     match open_file_window#run () with
     | `OPEN ->
         let filename = get_filename open_file_window#filename in
+
         (* TODO: Replace the print statement below with something that
            loads the file [filename] into the document*)
+        (* get a string from the file and then out it in the text field *)
+        insert_text (File.open_to_string filename) text_field;
         print_endline ("The file you selected was: " ^ filename)
     | `DELETE_EVENT | `CANCEL -> ()
   end;
@@ -166,7 +170,7 @@ let main () =
   factory#add_item "Save" ~key:_S ~callback:(fun () ->
       failwith "unimplemented");
   factory#add_item "Open file" ~key:_O ~callback:(fun () ->
-      load_file editor_window);
+      load_file editor_window text_field);
   factory#add_item "Quit" ~key:_Q ~callback:Main.quit;
 
   (* Theme menu *)

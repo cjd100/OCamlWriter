@@ -1,6 +1,12 @@
 open OUnit2
 open File
 open Gui
+open Yojson
+
+let ex_json = Yojson.Basic.from_file "current_state.json"
+
+(*let json_to_file_test json = assert_equal (Yojson.Basic.from_file
+  "new_json.json") (File.json_to_file "new_json.json" ex_json)*)
 
 let gui_tests = []
 
