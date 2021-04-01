@@ -2,11 +2,9 @@ MODULES=gui file author
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
-TEST=test.byte
+TEST=test.byte 
 MAIN=gui.byte
-OCAMLBUILD=ocamlbuild -use-ocamlfind -r
-PTHREAD_LIBS=@PTHREAD_LIBS@
-PTHREAD_CAML_LIBS=$(addprefix -cclib ,$(PTHREAD_LIBS))
+OCAMLBUILD=ocamlbuild -use-ocamlfind -r -tag thread
 
 default: build 
 	OCAMLRUNPARAM=b utop
