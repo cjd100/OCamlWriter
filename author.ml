@@ -1,4 +1,4 @@
-let hw_n = 2
+let hw_n = 8
 
 let hw_c = 2
 

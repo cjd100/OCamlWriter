@@ -165,6 +165,8 @@ let text_color_change textarea =
 
   colordlg#connect#response ~callback:(text_response colordlg textarea);
 
+  let () = Gc.minor () in
+  let () = ignore () in
   colordlg#run ();
   ()
 
