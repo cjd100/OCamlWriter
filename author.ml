@@ -1,6 +1,6 @@
 let hw_n = 8
 
-let hw_c = 2
+let hw_c = 6
 
 let hw_b = 4
 
