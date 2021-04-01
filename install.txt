@@ -1,0 +1,29 @@
+Instructions on how to install and build the system:
+
+WSL Installation Instructions:
+sudo apt-get install -y libgtk2.0-dev
+sudo apt-get install -y libexpat1-dev
+
+OSX Installation Instructions:
+brew install pkg-config
+brew install lablgtk
+
+OPAM commands to run:
+opam install ounit2
+opam install lablgtk
+opam install core
+opam install yojson
+
+When using WSL on Windows:
+Install Xming X Server for Windows
+https://sourceforge.net/projects/xming/
+
+Then run this command:
+nano ~/.bashrc gedit ~/.bashrc 
+
+And add this line to the end of the file:
+export DISPLAY=localhost:0.0
+
+
+Or use this at the start of every terminal session:
+export DISPLAY=localhost:0.0
