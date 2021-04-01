@@ -1,6 +1,5 @@
 open OUnit2
 open File
-open Gui
 open Yojson
 
 let ex_json = Yojson.Basic.from_file "current_state.json"
