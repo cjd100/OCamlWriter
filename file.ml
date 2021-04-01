@@ -23,8 +23,7 @@ let string_of_string_list lst sep =
   Stdlib.List.fold_left ( ^ ) "" separated
 
 (* let channel for reading file to strings *)
-let open_to_string name =
-  string_of_string_list (In_channel.read_lines name) " "
+let open_to_string name = In_channel.read_all name
 
 let create_file_type name = { name; contents = open_to_string name }
 
