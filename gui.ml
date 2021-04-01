@@ -2,6 +2,9 @@ open GMain
 open GdkKeysyms
 open File
 
+(* create a current file type *)
+type curr_file = string
+
 (* Initializes Gtk *)
 let init = GtkMain.Main.init ()
 
@@ -15,10 +18,25 @@ let win_dim = (400, 400)
    the text field [field] *)
 let insert_text text field = field#buffer#set_text text
 
+(* [new_file parent text_area] opens up a new window from the parent
+   window [parent]. The new window is a file creation widget that
+   creates an empty new file *)
+let new_file parent text_area =
+  let get_filename = function Some f -> f | None -> "" in
+  (* window that appears when the request file command is issued*)
+  let open_file_window =
+    GWindow.file_selection ~width:300 ~height:300 ~title:"NEW file"
+      ~parent ()
+  in
+  match open_file_window#show () with
+  | _ ->
+      "filename";
+      open_file_window#destroy ()
+
 (** [load_file parent] opens up a new window, with the parent window
     [parent]. The new window is a file selection GUI that loads the
     selected file into the document. *)
-let load_file parent text_field =
+let load_file parent text_area =
   let get_filename = function Some f -> f | None -> "" in
   (* window that appears when the request file command is issued*)
   let open_file_window =
@@ -27,6 +45,7 @@ let load_file parent text_field =
   in
   open_file_window#add_button_stock `CANCEL `CANCEL;
   open_file_window#add_select_button_stock `OPEN `OPEN;
+  open_file_window#add_select_button_stock `NEW `NEW;
   begin
     match open_file_window#run () with
     | `OPEN ->
@@ -35,9 +54,11 @@ let load_file parent text_field =
         (* TODO: Replace the print statement below with something that
            loads the file [filename] into the document*)
         (* get a string from the file and then out it in the text field *)
-        insert_text (File.open_to_string filename) text_field;
-        print_endline ("The file you selected was: " ^ filename)
-    | `DELETE_EVENT | `CANCEL -> ()
+        insert_text (File.open_to_string filename) text_area;
+        print_endline ("OPEN The file you selected was: " ^ filename);
+        filename
+    | `NEW -> "filename"
+    | `DELETE_EVENT | `CANCEL -> "NO FILE CHOSEN"
   end;
   open_file_window#destroy ()
 
@@ -163,10 +184,14 @@ let main () =
     text_field#misc#modify_text [ (`NORMAL, text) ]
   in
 
+  (* opens the file chooser GUI at the start and makes you choose a file
+     to use *)
+  let curr_file = load_file editor_window text_field in
+
   (* File menu *)
   let factory = new GMenu.factory file_menu ~accel_group in
   factory#add_item "New file" ~key:_N ~callback:(fun () ->
-      failwith "unimplemented");
+      load_file editor_window text_field);
   factory#add_item "Save" ~key:_S ~callback:(fun () ->
       failwith "unimplemented");
   factory#add_item "Open file" ~key:_O ~callback:(fun () ->
