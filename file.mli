@@ -13,7 +13,7 @@ val open_to_string : string -> string
 
 val save_to_file : string -> string -> unit
 
-val create_file : string -> ?buf:bytes -> ?pos:int -> ?len:int -> unit
+val create_file : string -> buf:bytes -> pos:int -> len:int -> unit
 
 (** [create_file_type filename] creates a value of type f that
     represents the file with name [filename] and text [contents]*)
