@@ -29,7 +29,7 @@ let save_to_file name text = Out_channel.write_all name text
 
 let create_file name =
   let out = Out_channel.create name in
-  Out_channel.output out
+  Out_channel.output_string out ""
 
 let create_file_type name = { name; contents = open_to_string name }
 

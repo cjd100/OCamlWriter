@@ -29,7 +29,6 @@ let insert_text text field = field#buffer#set_text text
    window [parent]. The new window is a file creation widget that
    creates an empty new file *)
 let new_file parent text_area =
-  let get_filename = function Some f -> f | None -> "" in
   (* window that appears when the request file command is issued*)
   let open_file_window =
     GWindow.dialog ~width:200 ~height:100 ~title:"Create new file"
@@ -47,6 +46,7 @@ let new_file parent text_area =
         curr_file.contents <- entry#text;
         let text = entry#text in
         ignore (File.create_file text)
+        (* why is it partial???*)
     | `DELETE_EVENT -> ()
   end;
   open_file_window#destroy
