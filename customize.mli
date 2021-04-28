@@ -55,3 +55,8 @@ val text_color_change :
       < modify_text : ([> `NORMAL ] * GDraw.color) list -> 'a ; .. >
   ; .. > ->
   unit
+
+(** Opens the font selector and outputs changes in font for modification
+    of the text area text *)
+val font_change :
+  < misc : < modify_font_by_name : string -> 'a ; .. > ; .. > -> unit

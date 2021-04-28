@@ -109,3 +109,44 @@ let text_color_change textarea =
 
   ignore (colordlg#run ());
   ()
+
+(* A reference to the mutable font dialogue *)
+let font_dialog_ref = ref None
+
+(* The font name of the text *)
+let font_name = ref ""
+
+(* Matches the feedback from the [dialogue] selection, and modifies the
+   text of [textarea] accordingly *)
+let font_response dialogue textarea resp =
+  let fontsel = dialogue#selection in
+  begin
+    match resp with
+    | `OK -> font_name := fontsel#font_name
+    | _ -> ()
+  end;
+  textarea#misc#modify_font_by_name !font_name;
+  dialogue#misc#hide ()
+
+let font_change textarea =
+  let fontdlg =
+    match !font_dialog_ref with
+    | None ->
+        let dlg =
+          GWindow.font_selection_dialog ~title:"Select Font Type" ()
+        in
+        font_dialog_ref := Some dlg;
+        dlg
+    | Some dlg -> dlg
+  in
+
+  let fontsel = fontdlg#selection in
+
+  fontsel#set_font_name !font_name;
+
+  ignore
+    (fontdlg#connect#response
+       ~callback:(font_response fontdlg textarea));
+
+  ignore (fontdlg#run ());
+  ()
