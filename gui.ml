@@ -90,7 +90,7 @@ let main () =
   in
   (* The main container that widgets will be packed in*)
   let container = GPack.vbox ~packing:editor_window#add () in
-  editor_window#connect#destroy ~callback:Main.quit;
+  ignore (editor_window#connect#destroy ~callback:Main.quit);
 
   (* Menu bar *)
   let topmenu = GMenu.menu_bar ~packing:container#pack () in
@@ -128,24 +128,31 @@ let main () =
 
   (* File menu *)
   let factory = new GMenu.factory file_menu ~accel_group in
-  factory#add_item "New file" ~key:_N ~callback:(fun () ->
-      load_file editor_window text_field);
-  factory#add_item "Save" ~key:_S ~callback:(fun () ->
-      File.save_to_file !curr_file (text_field#buffer#get_text ()));
-  factory#add_item "Open file" ~key:_O ~callback:(fun () ->
-      load_file editor_window text_field);
-  factory#add_item "Quit" ~key:_Q ~callback:Main.quit;
+  ignore
+    (factory#add_item "New file" ~key:_N ~callback:(fun () ->
+         load_file editor_window text_field));
+  ignore
+    (factory#add_item "Save" ~key:_S ~callback:(fun () ->
+         File.save_to_file !curr_file (text_field#buffer#get_text ())));
+  ignore
+    (factory#add_item "Open file" ~key:_O ~callback:(fun () ->
+         load_file editor_window text_field));
+  ignore (factory#add_item "Quit" ~key:_Q ~callback:Main.quit);
 
   (* Theme menu *)
   let factory = new GMenu.factory theme_menu ~accel_group in
-  factory#add_item "Dark Mode" ~callback:(fun () ->
-      Customize.preset_theme text_field `BLACK `WHITE);
-  factory#add_item "Light Mode" ~callback:(fun () ->
-      Customize.preset_theme text_field `WHITE `BLACK);
-  factory#add_item "Custom Background" ~callback:(fun () ->
-      Customize.background_color_change text_field);
-  factory#add_item "Custom Text Color" ~callback:(fun () ->
-      Customize.text_color_change text_field);
+  ignore
+    (factory#add_item "Dark Mode" ~callback:(fun () ->
+         Customize.preset_theme text_field `BLACK `WHITE));
+  ignore
+    (factory#add_item "Light Mode" ~callback:(fun () ->
+         Customize.preset_theme text_field `WHITE `BLACK));
+  ignore
+    (factory#add_item "Custom Background" ~callback:(fun () ->
+         Customize.background_color_change text_field));
+  ignore
+    (factory#add_item "Custom Text Color" ~callback:(fun () ->
+         Customize.text_color_change text_field));
 
   (* Displays the main window and continues the main loop, this should
      always be the last part *)
