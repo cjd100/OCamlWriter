@@ -45,3 +45,6 @@ docs-private: build
 
 zip:
 	zip text_editor.zip *.ml* *.json *.sh *.md *.txt _tags .merlin .ocamlformat .ocamlinit Makefile	
+
+cloc:
+	cloc --by-file --include-lang=OCaml --exclude-dir=_build .
