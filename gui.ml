@@ -4,7 +4,7 @@ open File
 
 let curr_file = ref ""
 
-let set_curr_val name () = curr_file := name
+let set_curr_val name = curr_file := name
 
 (* create a current file type *)
 type curr_file_state = {
@@ -45,8 +45,8 @@ let new_file parent text_area =
     | `OK ->
         curr_file.contents <- entry#text;
         let text = entry#text in
+        curr_file := text;
         ignore (File.create_file text)
-        (* why is it partial???*)
     | `DELETE_EVENT -> ()
   end;
   open_file_window#destroy
@@ -73,7 +73,7 @@ let load_file parent text_area =
            loads the file [filename] into the document*)
         (* get a string from the file and then out it in the text field *)
         print_endline ("OPEN The file you selected was: " ^ filename);
-        curr_file.contents <- filename;
+        curr_file := filename;
         ignore (insert_text (File.open_to_string filename) text_area)
     | `NEW -> ignore (new_file open_file_window text_area)
     (*why is it partial?*)
@@ -188,6 +188,12 @@ let main () =
   let file_menu = factory#add_submenu "File" in
   let theme_menu = factory#add_submenu "Themes" in
 
+  (* word count label *)
+  print_endline !curr_file;
+  let file_label =
+    GMisc.label ~text:!curr_file ~packing:container#pack ()
+  in
+
   (* Scroll bar for text widget. hpolicy and vpolicy cause the scrollbar
      to only show up when needed *)
   let text_scroll =
@@ -209,6 +215,9 @@ let main () =
   (* opens the file chooser GUI at the start and makes you choose a file
      to use *)
   load_file editor_window text_field;
+
+  (* consider using a meny item and then updating the label text to be
+     the word count *)
 
   (* File menu *)
   let factory = new GMenu.factory file_menu ~accel_group in
