@@ -5,6 +5,8 @@ open Customize
 
 let curr_file = ref ""
 
+let word_count = ref 0
+
 let set_curr_val name = curr_file := name
 
 (* create a current file type *)
@@ -119,10 +121,18 @@ let main () =
      to use *)
   load_file editor_window text_field;
 
+  word_count := Words.word_count (text_field#buffer#get_text ());
+
   (* consider using a meny item and then updating the label text to be
      the word count *)
   let file_label =
     GMisc.label ~text:!curr_file ~packing:container#pack ~height:20 ()
+  in
+
+  let word_label =
+    GMisc.label
+      ~text:("Words: " ^ string_of_int !word_count)
+      ~packing:container#pack ~height:20 ()
   in
 
   (* File menu *)
