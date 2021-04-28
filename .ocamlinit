@@ -1,6 +1,7 @@
 #require "ounit2";;
 #require "lablgtk2";;
 #require "core";;
+#require "yojson";;
 #load "gui.cmo";;
 #load "file.cmo"
 
