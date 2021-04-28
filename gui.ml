@@ -102,10 +102,6 @@ let main () =
   let theme_menu = factory#add_submenu "Themes" in
 
   (* word count label *)
-  print_endline !curr_file;
-  let file_label =
-    GMisc.label ~text:!curr_file ~packing:container#pack ()
-  in
 
   (* Scroll bar for text widget. hpolicy and vpolicy cause the scrollbar
      to only show up when needed *)
@@ -125,6 +121,9 @@ let main () =
 
   (* consider using a meny item and then updating the label text to be
      the word count *)
+  let file_label =
+    GMisc.label ~text:!curr_file ~packing:container#pack ~height:20 ()
+  in
 
   (* File menu *)
   let factory = new GMenu.factory file_menu ~accel_group in
