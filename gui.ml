@@ -152,7 +152,9 @@ let main () =
   ignore
     (factory#add_item "Custom Text Color" ~callback:(fun () ->
          Customize.text_color_change text_field));
-
+  ignore
+    (factory#add_item "Custom Font" ~callback:(fun () ->
+         Customize.font_change text_field));
   (* Displays the main window and continues the main loop, this should
      always be the last part *)
   editor_window#add_accel_group accel_group;
