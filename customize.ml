@@ -1,3 +1,28 @@
+let preset_theme textarea bg text =
+  textarea#misc#modify_base
+    [
+      ( `NORMAL,
+        ( bg
+          : [ `BLACK
+            | `COLOR of Gdk.color
+            | `NAME of string
+            | `RGB of int * int * int
+            | `WHITE
+            ] ) );
+    ];
+  textarea#misc#modify_text
+    [
+      ( `NORMAL,
+        ( text
+          : [ `BLACK
+            | `COLOR of Gdk.color
+            | `NAME of string
+            | `RGB of int * int * int
+            | `WHITE
+            ] ) );
+    ];
+  ()
+
 (* A reference to the mutable palette dialogue *)
 let bg_dialog_ref = ref None
 

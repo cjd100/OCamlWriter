@@ -119,12 +119,6 @@ let main () =
     GText.view ~packing:text_scroll#add_with_viewport ()
   in
 
-  (* Modifies the background color to [bg] and the text color to [text] *)
-  let preset_theme bg text =
-    text_field#misc#modify_base [ (`NORMAL, bg) ];
-    text_field#misc#modify_text [ (`NORMAL, text) ]
-  in
-
   (* opens the file chooser GUI at the start and makes you choose a file
      to use *)
   load_file editor_window text_field;
@@ -145,9 +139,9 @@ let main () =
   (* Theme menu *)
   let factory = new GMenu.factory theme_menu ~accel_group in
   factory#add_item "Dark Mode" ~callback:(fun () ->
-      preset_theme `BLACK `WHITE);
+      Customize.preset_theme text_field `BLACK `WHITE);
   factory#add_item "Light Mode" ~callback:(fun () ->
-      preset_theme `WHITE `BLACK);
+      Customize.preset_theme text_field `WHITE `BLACK);
   factory#add_item "Custom Background" ~callback:(fun () ->
       Customize.background_color_change text_field);
   factory#add_item "Custom Text Color" ~callback:(fun () ->
