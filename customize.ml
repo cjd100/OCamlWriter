@@ -5,7 +5,6 @@ let update_json bg t f =
     {|{"background color" : |} ^ bg ^ {|, "text color": |} ^ t
     ^ {|, "font" : |} ^ f ^ "}"
   in
-  print_endline str;
   Yojson.Basic.to_file "current_state.json"
     (Yojson.Basic.from_string str)
 
