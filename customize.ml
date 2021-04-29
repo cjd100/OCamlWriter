@@ -1,3 +1,9 @@
+let update_json bg t fn fs =
+  let t =
+    {|{"background color" : bg, "text color": t, "font" : {"name" : fn, "size" : fs}}|}
+  in
+  Yojson.Basic.to_file "current_state.json" (Yojson.Basic.from_string t)
+
 let preset_theme textarea bg text =
   textarea#misc#modify_base
     [
@@ -126,6 +132,7 @@ let font_response dialogue textarea resp =
     | _ -> ()
   end;
   textarea#misc#modify_font_by_name !font_name;
+  update_json "test" "test" !font_name "test";
   dialogue#misc#hide ()
 
 let font_change textarea =

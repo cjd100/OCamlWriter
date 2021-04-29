@@ -9,3 +9,5 @@ val encrypt : string -> string -> string
     into a readable form using [key]. Transforms cipher text into plain
     text. *)
 val decrypt : string -> string -> string
+
+val block_list : string -> bool -> string list
