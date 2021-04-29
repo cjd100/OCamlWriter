@@ -99,6 +99,30 @@ let undo parent text_area =
   | None -> ()
   | Some text -> insert_text text text_area
 
+let rgbtuple_of_string str =
+  let values = String.split_on_char ' ' str in
+  match values with
+  | h :: i :: j :: t ->
+      ( `RGB (int_of_string h, int_of_string i, int_of_string j)
+        : GDraw.color )
+  | _ -> `BLACK
+
+let load_settings textarea =
+  let previous_settings =
+    String.split_on_char '%'
+      (Customize.from_json
+         (Yojson.Basic.from_file "current_state.json"))
+  in
+  match previous_settings with
+  | h :: i :: j :: t ->
+      let background = rgbtuple_of_string h in
+      let text = rgbtuple_of_string i in
+      let font = j in
+      textarea#misc#modify_base [ (`NORMAL, background) ];
+      textarea#misc#modify_text [ (`NORMAL, text) ];
+      textarea#misc#modify_font_by_name font
+  | _ -> ()
+
 let main () =
   let editor_window =
     GWindow.window ~width:(fst win_dim) ~height:(snd win_dim)
@@ -134,6 +158,9 @@ let main () =
   (* opens the file chooser GUI at the start and makes you choose a file
      to use *)
   load_file editor_window text_field;
+
+  (* Loads previous settings *)
+  load_settings text_field;
 
   word_count := Words.word_count (text_field#buffer#get_text ());
 
