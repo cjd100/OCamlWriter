@@ -2,8 +2,12 @@ open GMain
 open GdkKeysyms
 open File
 open Customize
+open State
+open Stack
 
 let curr_file = ref ""
+
+let state = Stack.create ()
 
 let word_count = ref 0
 
@@ -85,6 +89,14 @@ let load_file parent text_area =
   end;
   open_file_window#destroy ()
 
+let save name text =
+  Stack.push text state;
+  File.save_to_file name text
+
+let undo parent text_area =
+  let text = Stack.pop state in
+  insert_text text text_area
+
 let main () =
   let editor_window =
     GWindow.window ~width:(fst win_dim) ~height:(snd win_dim)
@@ -142,10 +154,13 @@ let main () =
          load_file editor_window text_field));
   ignore
     (factory#add_item "Save" ~key:_S ~callback:(fun () ->
-         File.save_to_file !curr_file (text_field#buffer#get_text ())));
+         save !curr_file (text_field#buffer#get_text ())));
   ignore
     (factory#add_item "Open file" ~key:_O ~callback:(fun () ->
          load_file editor_window text_field));
+  ignore
+    (factory#add_item "Undo" ~key:_Z ~callback:(fun () ->
+         undo editor_window text_field));
   ignore (factory#add_item "Quit" ~key:_Q ~callback:Main.quit);
 
   (* Theme menu *)
