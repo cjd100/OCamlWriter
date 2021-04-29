@@ -20,7 +20,7 @@ let string_of_color = function
       string_of_int r ^ {| |} ^ string_of_int g ^ {| |}
       ^ string_of_int b
   | `BLACK -> "0 0 0"
-  | `WHITE -> "255 255 255"
+  | `WHITE -> "65535 65535 65535"
   | `NAME s -> s
 
 (* A reference to the mutable palette dialogue *)
