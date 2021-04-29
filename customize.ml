@@ -1,18 +1,10 @@
 let update_json bg t f =
-  let split_font = String.split_on_char ' ' f in
-  match split_font with
-  | [] -> ()
-  | [ h ] -> ()
-  | h :: i :: tail ->
-      let fn = h in
-      let fs = i in
-      let str =
-        {|{"background color" : |} ^ bg ^ {|, "text color": |} ^ t
-        ^ {|, "font" : {"name" : |} ^ fn ^ {|, "size" : |} ^ fs
-        ^ {|}}}|}
-      in
-      Yojson.Basic.to_file "current_state.json"
-        (Yojson.Basic.from_string str)
+  let str =
+    {|{"background color" : |} ^ bg ^ {|, "text color": |} ^ t
+    ^ {|, "font" : |} ^ f ^ {|}|}
+  in
+  Yojson.Basic.to_file "current_state.json"
+    (Yojson.Basic.from_string str)
 
 let string_of_rgbtuple = function
   | (`RGB (r, g, b) : GDraw.color) ->
