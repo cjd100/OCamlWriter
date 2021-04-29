@@ -116,7 +116,7 @@ let rgbtuple_of_string str =
            int_of_string (String.trim i),
            int_of_string (String.trim j) )
         : GDraw.color)
-  | _ -> `BLACK
+  | _ -> `WHITE
 
 let load_settings textarea =
   let previous_settings =

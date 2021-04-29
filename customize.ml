@@ -10,7 +10,7 @@ let update_json bg t f =
 
 let string_of_rgbtuple = function
   | (`RGB (r, g, b) : GDraw.color) ->
-      {|"|} ^ string_of_int r ^ {|, |} ^ string_of_int g ^ {|, |}
+      {|"|} ^ string_of_int r ^ {| |} ^ string_of_int g ^ {| |}
       ^ string_of_int b ^ {|"|}
   | _ -> ""
 
@@ -45,6 +45,18 @@ let bg_dialog_ref = ref None
 (* The color of the background broken up into RGB values *)
 let bg_color = ref (`RGB (0, 0, 0))
 
+(* A reference to the mutable palette dialogue *)
+let text_dialog_ref = ref None
+
+(* The color of the background broken up into RGB values *)
+let text_color = ref (`RGB (0, 0, 0))
+
+(* A reference to the mutable font dialogue *)
+let font_dialog_ref = ref None
+
+(* The font name of the text *)
+let font_name = ref ""
+
 (* Matches the feedback from the [dialogue] palette, and modifies the
    background of [textarea] accordingly *)
 let background_response dialogue textarea resp =
@@ -57,7 +69,8 @@ let background_response dialogue textarea resp =
   textarea#misc#modify_base [ (`NORMAL, !bg_color) ];
   update_json
     ({|"|} ^ string_of_rgbtuple !bg_color ^ {|"|})
-    {|"test"|} {|"test"|};
+    ({|"|} ^ string_of_rgbtuple !text_color ^ {|"|})
+    ({|"|} ^ !font_name ^ {|"|});
   dialogue#misc#hide ()
 
 (* Opens the color palette and outputs changes in color for modification
@@ -87,12 +100,6 @@ let background_color_change textarea =
   ignore (colordlg#run ());
   ()
 
-(* A reference to the mutable palette dialogue *)
-let text_dialog_ref = ref None
-
-(* The color of the background broken up into RGB values *)
-let text_color = ref (`RGB (0, 0, 0))
-
 (* Matches the feedback from the [dialogue] palette, and modifies the
    text of [textarea] accordingly *)
 let text_response dialogue textarea resp =
@@ -103,9 +110,10 @@ let text_response dialogue textarea resp =
     | _ -> ()
   end;
   textarea#misc#modify_text [ (`NORMAL, !text_color) ];
-  update_json {|"test"|}
+  update_json
+    ({|"|} ^ string_of_rgbtuple !bg_color ^ {|"|})
     ({|"|} ^ string_of_rgbtuple !text_color ^ {|"|})
-    {|"test"|};
+    ({|"|} ^ !font_name ^ {|"|});
   dialogue#misc#hide ()
 
 let text_color_change textarea =
@@ -132,12 +140,6 @@ let text_color_change textarea =
   ignore (colordlg#run ());
   ()
 
-(* A reference to the mutable font dialogue *)
-let font_dialog_ref = ref None
-
-(* The font name of the text *)
-let font_name = ref ""
-
 (* Matches the feedback from the [dialogue] selection, and modifies the
    text of [textarea] accordingly *)
 let font_response dialogue textarea resp =
@@ -148,7 +150,10 @@ let font_response dialogue textarea resp =
     | _ -> ()
   end;
   textarea#misc#modify_font_by_name !font_name;
-  update_json {|"4 4 4"|} {|"4 4 4"|} ({|"|} ^ !font_name ^ {|"|});
+  update_json
+    ({|"|} ^ string_of_rgbtuple !bg_color ^ {|"|})
+    ({|"|} ^ string_of_rgbtuple !text_color ^ {|"|})
+    ({|"|} ^ !font_name ^ {|"|});
   dialogue#misc#hide ()
 
 let font_change textarea =
