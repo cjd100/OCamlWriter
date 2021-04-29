@@ -7,6 +7,8 @@ open Stack
 
 let curr_file = ref ""
 
+(* probably want to create new state for each load_file. Also integrate
+   into main *)
 let state = Stack.create ()
 
 let word_count = ref 0
