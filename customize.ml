@@ -1,6 +1,7 @@
 let update_json bg t fn fs =
   let t =
-    {|{"background color" : bg, "text color": t, "font" : {"name" : fn, "size" : fs}}|}
+    {|{"background color" : |} ^ bg ^ {|, "text color": |} ^ t
+    ^ {|, "font" : {"name" : |} ^ fn ^ {|, "size" : |} ^ fs ^ {|}}}|}
   in
   Yojson.Basic.to_file "current_state.json" (Yojson.Basic.from_string t)
 
