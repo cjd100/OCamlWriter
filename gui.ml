@@ -94,8 +94,9 @@ let save name text =
   File.save_to_file name text
 
 let undo parent text_area =
-  let text = Stack.pop state in
-  insert_text text text_area
+  match Stack.pop_opt state with
+  | None -> ()
+  | Some text -> insert_text text text_area
 
 let main () =
   let editor_window =
