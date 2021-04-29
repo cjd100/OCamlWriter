@@ -13,6 +13,8 @@ let state = Stack.create ()
 
 let word_count = ref 0
 
+let char_count = ref 0
+
 let set_curr_val name = curr_file := name
 
 let changed = ref false
@@ -38,8 +40,10 @@ let insert_text text field = field#buffer#set_text text
 
 let insert_label_text text label = label#set_text text
 
-let insert_count count label =
-  label#set_text ("Words: " ^ string_of_int count)
+let insert_counts wcount ccount label =
+  label#set_text
+    ("Words: " ^ string_of_int wcount ^ " Characters: "
+   ^ string_of_int ccount)
 
 (* [new_file parent text_area] opens up a new window from the parent
    window [parent]. The new window is a file creation widget that
@@ -91,8 +95,9 @@ let load_file parent file_label word_label text_area =
         print_endline ("OPEN The file you selected was: " ^ filename);
         curr_file := filename;
         word_count := Words.word_count (File.open_to_string filename);
+        char_count := Words.char_count (File.open_to_string filename);
         insert_label_text filename file_label;
-        insert_count !word_count word_label;
+        insert_counts !word_count !char_count word_label;
         ignore (state = Stack.create ());
         (* ignored *)
         Stack.push (File.open_to_string filename) state;
@@ -109,7 +114,8 @@ let save word_label name text =
   changed := true;
   Stack.iter print_endline state;
   word_count := Words.word_count text;
-  insert_count !word_count word_label;
+  char_count := Words.char_count text;
+  insert_counts !word_count !char_count word_label;
   File.save_to_file name text
 
 (* if false then match Stack.top_opt state with | None -> () | Some text

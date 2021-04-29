@@ -35,3 +35,11 @@ let word_count s =
       (Str.split (Str.regexp "[ \n\r\x0c\t]+") s)
   in
   List.length filtered
+
+(* counts the length of any string in characters, minus any whitespace
+   characters. Needs to start at 1, not 0 *)
+let char_count str =
+  let filtered =
+    Str.global_replace (Str.regexp "[ \n\r\x0c\t]+") "" str
+  in
+  String.length filtered
