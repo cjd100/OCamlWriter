@@ -1,16 +1,5 @@
 {
-  "background color": [
-    0,
-    0,
-    0
-  ],
-  "text color": [
-    0,
-    0,
-    0
-  ],
-  "font": {
-    "name": "Calibri",
-    "size": 12
-  }
+  "background color": "0 0 0",
+  "text color": "0 0 0",
+  "font": "Calibri 12"
 }
