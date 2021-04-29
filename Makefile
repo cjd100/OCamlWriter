@@ -1,4 +1,4 @@
-MODULES=gui file author customize words
+MODULES=gui file author customize words state
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
