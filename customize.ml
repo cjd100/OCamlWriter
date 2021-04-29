@@ -8,10 +8,15 @@ let update_json bg t f =
   Yojson.Basic.to_file "current_state.json"
     (Yojson.Basic.from_string str)
 
-let string_of_rgbtuple = function
-  | (`RGB (r, g, b) : GDraw.color) ->
-      {|"|} ^ string_of_int r ^ {| |} ^ string_of_int g ^ {| |}
-      ^ string_of_int b ^ {|"|}
+let string_of_color = function
+  | (`COLOR c : GDraw.color) ->
+      {|"|}
+      ^ string_of_int (Gdk.Color.red c)
+      ^ {| |}
+      ^ string_of_int (Gdk.Color.green c)
+      ^ {| |}
+      ^ string_of_int (Gdk.Color.blue c)
+      ^ {|"|}
   | _ -> ""
 
 let preset_theme textarea bg text =
@@ -68,8 +73,8 @@ let background_response dialogue textarea resp =
   end;
   textarea#misc#modify_base [ (`NORMAL, !bg_color) ];
   update_json
-    ({|"|} ^ string_of_rgbtuple !bg_color ^ {|"|})
-    ({|"|} ^ string_of_rgbtuple !text_color ^ {|"|})
+    ({|"|} ^ string_of_color !bg_color ^ {|"|})
+    ({|"|} ^ string_of_color !text_color ^ {|"|})
     ({|"|} ^ !font_name ^ {|"|});
   dialogue#misc#hide ()
 
@@ -111,8 +116,8 @@ let text_response dialogue textarea resp =
   end;
   textarea#misc#modify_text [ (`NORMAL, !text_color) ];
   update_json
-    ({|"|} ^ string_of_rgbtuple !bg_color ^ {|"|})
-    ({|"|} ^ string_of_rgbtuple !text_color ^ {|"|})
+    ({|"|} ^ string_of_color !bg_color ^ {|"|})
+    ({|"|} ^ string_of_color !text_color ^ {|"|})
     ({|"|} ^ !font_name ^ {|"|});
   dialogue#misc#hide ()
 
@@ -151,8 +156,8 @@ let font_response dialogue textarea resp =
   end;
   textarea#misc#modify_font_by_name !font_name;
   update_json
-    ({|"|} ^ string_of_rgbtuple !bg_color ^ {|"|})
-    ({|"|} ^ string_of_rgbtuple !text_color ^ {|"|})
+    ({|"|} ^ string_of_color !bg_color ^ {|"|})
+    ({|"|} ^ string_of_color !text_color ^ {|"|})
     ({|"|} ^ !font_name ^ {|"|});
   dialogue#misc#hide ()
 
