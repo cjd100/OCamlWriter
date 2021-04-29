@@ -1,9 +1,9 @@
 let update_json bg t fn fs =
-  let t =
+  let s =
     {|{"background color" : |} ^ bg ^ {|, "text color": |} ^ t
     ^ {|, "font" : {"name" : |} ^ fn ^ {|, "size" : |} ^ fs ^ {|}}}|}
   in
-  Yojson.Basic.to_file "current_state.json" (Yojson.Basic.from_string t)
+  Yojson.Basic.to_file "current_state.json" (Yojson.Basic.from_string s)
 
 let preset_theme textarea bg text =
   textarea#misc#modify_base
