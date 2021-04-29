@@ -97,9 +97,10 @@ let load_file parent file_label word_label text_area =
   end;
   open_file_window#destroy ()
 
-let save parent_container name text =
+let save word_label name text =
   Stack.push text state;
   word_count := Words.word_count text;
+  insert_count !word_count word_label;
   File.save_to_file name text
 
 let undo parent text_area =
@@ -192,7 +193,7 @@ let main () =
          load_file editor_window file_label word_label text_field));
   ignore
     (factory#add_item "Save" ~key:_S ~callback:(fun () ->
-         save container !curr_file (text_field#buffer#get_text ())));
+         save word_label !curr_file (text_field#buffer#get_text ())));
   ignore
     (factory#add_item "Open file" ~key:_O ~callback:(fun () ->
          load_file editor_window file_label word_label text_field));
