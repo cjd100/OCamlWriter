@@ -114,18 +114,18 @@ let rgbtuple_of_string str =
   let values = String.split_on_char ' ' str in
   match values with
   | h :: i :: j :: t ->
-      (`RGB
-         ( int_of_string (String.trim h),
-           int_of_string (String.trim i),
-           int_of_string (String.trim j) )
-        : GDraw.color)
+      ( `RGB
+          ( int_of_string (String.trim h),
+            int_of_string (String.trim i),
+            int_of_string (String.trim j) )
+        : GDraw.color )
   | _ -> `WHITE
 
 let load_settings textarea =
   let previous_settings =
-    String.split_on_char '%'
-      (Customize.from_json
-         (Yojson.Basic.from_file "current_state.json"))
+    Yojson.Basic.from_file "current_state.json"
+    |> Customize.from_json
+    |> String.split_on_char '%'
   in
   match previous_settings with
   | h :: i :: j :: t ->
