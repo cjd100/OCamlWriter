@@ -9,24 +9,24 @@ let preset_theme textarea bg text =
   textarea#misc#modify_base
     [
       ( `NORMAL,
-        ( bg
+        (bg
           : [ `BLACK
             | `COLOR of Gdk.color
             | `NAME of string
             | `RGB of int * int * int
             | `WHITE
-            ] ) );
+            ]) );
     ];
   textarea#misc#modify_text
     [
       ( `NORMAL,
-        ( text
+        (text
           : [ `BLACK
             | `COLOR of Gdk.color
             | `NAME of string
             | `RGB of int * int * int
             | `WHITE
-            ] ) );
+            ]) );
     ];
   ()
 
