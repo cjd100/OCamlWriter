@@ -17,7 +17,7 @@ let string_of_color = function
       ^ {| |}
       ^ string_of_int (Gdk.Color.blue c)
       ^ {|"|}
-  | _ -> ""
+  | _ -> {|""|}
 
 let preset_theme textarea bg text =
   textarea#misc#modify_base
