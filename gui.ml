@@ -32,6 +32,11 @@ let win_dim = (400, 400)
    the text field [field] *)
 let insert_text text field = field#buffer#set_text text
 
+let insert_label_text text label = label#set_text text
+
+let insert_count count label =
+  label#set_text ("Words: " ^ string_of_int count)
+
 (* [new_file parent text_area] opens up a new window from the parent
    window [parent]. The new window is a file creation widget that
    creates an empty new file *)
@@ -61,7 +66,7 @@ let new_file parent text_area =
 (** [load_file parent] opens up a new window, with the parent window
     [parent]. The new window is a file selection GUI that loads the
     selected file into the document. *)
-let load_file parent text_area =
+let load_file parent file_label word_label text_area =
   let get_filename = function Some f -> f | None -> "" in
   (* window that appears when the request file command is issued*)
   let open_file_window =
@@ -81,6 +86,9 @@ let load_file parent text_area =
         (* get a string from the file and then out it in the text field *)
         print_endline ("OPEN The file you selected was: " ^ filename);
         curr_file := filename;
+        word_count := Words.word_count (File.open_to_string filename);
+        insert_label_text filename file_label;
+        insert_count !word_count word_label;
         ignore (insert_text (File.open_to_string filename) text_area)
     | `NEW -> ignore (new_file open_file_window text_area)
     (*why is it partial?*)
@@ -89,8 +97,10 @@ let load_file parent text_area =
   end;
   open_file_window#destroy ()
 
-let save name text =
+let save word_label name text =
   Stack.push text state;
+  word_count := Words.word_count text;
+  insert_count !word_count word_label;
   File.save_to_file name text
 
 let undo parent text_area =
@@ -102,11 +112,11 @@ let rgbtuple_of_string str =
   let values = String.split_on_char ' ' str in
   match values with
   | h :: i :: j :: t ->
-      ( `RGB
-          ( int_of_string (String.trim h),
-            int_of_string (String.trim i),
-            int_of_string (String.trim j) )
-        : GDraw.color )
+      (`RGB
+         ( int_of_string (String.trim h),
+           int_of_string (String.trim i),
+           int_of_string (String.trim j) )
+        : GDraw.color)
   | _ -> `WHITE
 
 let load_settings textarea =
@@ -159,15 +169,6 @@ let main () =
 
   (* opens the file chooser GUI at the start and makes you choose a file
      to use *)
-  load_file editor_window text_field;
-
-  (* Loads previous settings *)
-  load_settings text_field;
-
-  word_count := Words.word_count (text_field#buffer#get_text ());
-
-  (* consider using a meny item and then updating the label text to be
-     the word count *)
   let file_label =
     GMisc.label ~text:!curr_file ~packing:container#pack ~height:20 ()
   in
@@ -177,18 +178,25 @@ let main () =
       ~text:("Words: " ^ string_of_int !word_count)
       ~packing:container#pack ~height:20 ()
   in
+  load_file editor_window file_label word_label text_field;
+
+  (* Loads previous settings *)
+  load_settings text_field;
+
+  (* consider using a meny item and then updating the label text to be
+     the word count *)
 
   (* File menu *)
   let factory = new GMenu.factory file_menu ~accel_group in
   ignore
     (factory#add_item "New file" ~key:_N ~callback:(fun () ->
-         load_file editor_window text_field));
+         load_file editor_window file_label word_label text_field));
   ignore
     (factory#add_item "Save" ~key:_S ~callback:(fun () ->
-         save !curr_file (text_field#buffer#get_text ())));
+         save word_label !curr_file (text_field#buffer#get_text ())));
   ignore
     (factory#add_item "Open file" ~key:_O ~callback:(fun () ->
-         load_file editor_window text_field));
+         load_file editor_window file_label word_label text_field));
   ignore
     (factory#add_item "Undo" ~key:_Z ~callback:(fun () ->
          undo editor_window text_field));
@@ -211,9 +219,11 @@ let main () =
   ignore
     (factory#add_item "Custom Font" ~callback:(fun () ->
          Customize.font_change text_field));
+
   (* Displays the main window and continues the main loop, this should
      always be the last part *)
   editor_window#add_accel_group accel_group;
+
   editor_window#show ();
   Main.main ()
 
