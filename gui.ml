@@ -82,9 +82,6 @@ let load_file parent file_label word_label text_area =
     match open_file_window#run () with
     | `OPEN ->
         let filename = get_filename open_file_window#filename in
-
-        (* TODO: Replace the print statement below with something that
-           loads the file [filename] into the document*)
         (* get a string from the file and then out it in the text field *)
         print_endline ("OPEN The file you selected was: " ^ filename);
         curr_file := filename;
@@ -101,6 +98,41 @@ let load_file parent file_label word_label text_area =
     | `DELETE_EVENT | `CANCEL -> ()
   end;
   open_file_window#destroy ()
+
+(** [encrypt_file pass text_area text parent] encrypts the [text] using
+    password [pass], closing the window [parent] at the end *)
+let encrypt_file pass text_area text parent =
+  insert_text (Cipher.encrypt pass text) text_area;
+  parent#destroy
+
+(** [decrypt_file pass text_area text parent] encrypts [text] using
+    password [pass], then puts closing the window [parent] at the end *)
+let decrypt_file pass text_area text parent =
+  insert_text (Cipher.decrypt pass text) text_area;
+  parent#destroy
+
+let cipher_window text_area text (encrypt : bool) =
+  let title = ref "" in
+  if encrypt then title := "Encryption: Input password"
+  else title := "Decryption: Input password";
+  let password_input =
+    GWindow.window ~width:400 ~height:200 ~title:!title ()
+  in
+  let container = GPack.vbox ~packing:password_input#add () in
+  ignore
+    (password_input#connect#destroy ~callback:password_input#destroy);
+  let text_entry =
+    GEdit.entry ~packing:container#add ~width:350 ~height:100 ()
+  in
+
+  let confirm_button =
+    GButton.button ~stock:`APPLY ~packing:container#add ()
+  in
+  confirm_button#connect#clicked ~callback:(fun () ->
+      if encrypt then
+        encrypt_file text_entry#text text_area text password_input ()
+      else decrypt_file text_entry#text text_area text password_input ());
+  password_input#show
 
 let save word_label name text =
   Stack.push text state;
@@ -157,6 +189,7 @@ let main () =
   (* Submenus *)
   let file_menu = factory#add_submenu "File" in
   let theme_menu = factory#add_submenu "Themes" in
+  let encryption_menu = factory#add_submenu "Encryption" in
 
   (* word count label *)
 
@@ -224,6 +257,20 @@ let main () =
   ignore
     (factory#add_item "Custom Font" ~callback:(fun () ->
          Customize.font_change text_field));
+
+  (* Encryption menu *)
+  let factory = new GMenu.factory encryption_menu ~accel_group in
+  ignore
+    (factory#add_item "Encrypt" ~callback:(fun () ->
+         cipher_window text_field
+           (text_field#buffer#get_text ())
+           true ()));
+  ignore
+    (factory#add_item "Decrypt" ~callback:(fun () ->
+         cipher_window text_field
+           (text_field#buffer#get_text ())
+           false ()));
+  print_endline (text_field#buffer#get_text ());
 
   (* Displays the main window and continues the main loop, this should
      always be the last part *)
