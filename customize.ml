@@ -17,8 +17,8 @@ let string_of_color = function
       ^ {| |}
       ^ string_of_int (Gdk.Color.blue c)
   | `RGB (r, g, b) ->
-      {|"|} ^ string_of_int r ^ {| |} ^ string_of_int g ^ {| |}
-      ^ string_of_int b ^ {|"|}
+      string_of_int r ^ {| |} ^ string_of_int g ^ {| |}
+      ^ string_of_int b
   | `BLACK -> "0 0 0"
   | `WHITE -> "255 255 255"
   | `NAME s -> s
