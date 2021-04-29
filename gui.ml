@@ -103,8 +103,16 @@ let rgbtuple_of_string str =
   let values = String.split_on_char ' ' str in
   match values with
   | h :: i :: j :: t ->
+<<<<<<< HEAD
       (`RGB (int_of_string h, int_of_string i, int_of_string j)
         : GDraw.color)
+=======
+      ( `RGB
+          ( int_of_string (String.trim h),
+            int_of_string (String.trim i),
+            int_of_string (String.trim j) )
+        : GDraw.color )
+>>>>>>> 0415c1ebbc99e2dc8d95281bdba1ea64fd964000
   | _ -> `BLACK
 
 let load_settings textarea =
