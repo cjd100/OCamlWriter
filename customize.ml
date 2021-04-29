@@ -23,31 +23,6 @@ let string_of_color = function
   | `WHITE -> "255 255 255"
   | `NAME s -> s
 
-let preset_theme textarea bg text =
-  textarea#misc#modify_base
-    [
-      ( `NORMAL,
-        (bg
-          : [ `BLACK
-            | `COLOR of Gdk.color
-            | `NAME of string
-            | `RGB of int * int * int
-            | `WHITE
-            ]) );
-    ];
-  textarea#misc#modify_text
-    [
-      ( `NORMAL,
-        (text
-          : [ `BLACK
-            | `COLOR of Gdk.color
-            | `NAME of string
-            | `RGB of int * int * int
-            | `WHITE
-            ]) );
-    ];
-  ()
-
 (* A reference to the mutable palette dialogue *)
 let bg_dialog_ref = ref None
 
@@ -65,6 +40,35 @@ let font_dialog_ref = ref None
 
 (* The font name of the text *)
 let font_name = ref ""
+
+let preset_theme textarea bg text =
+  textarea#misc#modify_base
+    [
+      ( `NORMAL,
+        ( bg
+          : [ `BLACK
+            | `COLOR of Gdk.color
+            | `NAME of string
+            | `RGB of int * int * int
+            | `WHITE
+            ] ) );
+    ];
+  textarea#misc#modify_text
+    [
+      ( `NORMAL,
+        ( text
+          : [ `BLACK
+            | `COLOR of Gdk.color
+            | `NAME of string
+            | `RGB of int * int * int
+            | `WHITE
+            ] ) );
+    ];
+  update_json
+    ({|"|} ^ string_of_color bg ^ {|"|})
+    ({|"|} ^ string_of_color text ^ {|"|})
+    ({|"|} ^ !font_name ^ {|"|});
+  ()
 
 (* Matches the feedback from the [dialogue] palette, and modifies the
    background of [textarea] accordingly *)
