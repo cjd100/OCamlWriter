@@ -15,6 +15,8 @@ let word_count = ref 0
 
 let set_curr_val name = curr_file := name
 
+let changed = ref false
+
 (* create a current file type *)
 type curr_file_state = {
   name : string;
@@ -136,11 +138,20 @@ let cipher_window text_area text (encrypt : bool) =
 
 let save word_label name text =
   Stack.push text state;
+  changed := true;
+  Stack.iter print_endline state;
   word_count := Words.word_count text;
   insert_count !word_count word_label;
   File.save_to_file name text
 
+(* if false then match Stack.top_opt state with | None -> () | Some text
+   -> insert_text text text_area else *)
 let undo parent text_area =
+  print_endline (string_of_bool !changed);
+  changed := false;
+  if Stack.length state = 1 then insert_text (Stack.top state) text_area
+  else if !changed = true then ignore (Stack.pop_opt state)
+  else ();
   match Stack.pop_opt state with
   | None -> ()
   | Some text -> insert_text text text_area
