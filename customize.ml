@@ -11,13 +11,11 @@ let update_json bg t f =
 
 let string_of_color = function
   | (`COLOR c : GDraw.color) ->
-      {|"|}
-      ^ string_of_int (Gdk.Color.red c)
+      string_of_int (Gdk.Color.red c)
       ^ {| |}
       ^ string_of_int (Gdk.Color.green c)
       ^ {| |}
       ^ string_of_int (Gdk.Color.blue c)
-      ^ {|"|}
   | `RGB (r, g, b) ->
       {|"|} ^ string_of_int r ^ {| |} ^ string_of_int g ^ {| |}
       ^ string_of_int b ^ {|"|}
