@@ -1,3 +1,5 @@
+open Yojson.Basic.Util
+
 let update_json bg t f =
   let str =
     {|{"background color" : |} ^ bg ^ {|, "text color": |} ^ t
@@ -8,8 +10,8 @@ let update_json bg t f =
 
 let string_of_rgbtuple = function
   | (`RGB (r, g, b) : GDraw.color) ->
-      {|["|} ^ string_of_int r ^ {|", "|} ^ string_of_int g ^ {|", "|}
-      ^ string_of_int b ^ {|"]|}
+      {|"|} ^ string_of_int r ^ {|, |} ^ string_of_int g ^ {|, |}
+      ^ string_of_int b ^ {|"|}
   | _ -> ""
 
 let preset_theme textarea bg text =
@@ -172,4 +174,12 @@ let font_change textarea =
   ignore (fontdlg#run ());
   ()
 
-let from_json textarea json = failwith "Unimplemented"
+let rgbtuple_of_string str =
+  let values = String.split_on_char ' ' str in
+  match values with h :: i :: j :: t -> (h, i, j)
+
+let from_json textarea json =
+  let background = json |> member "background color" |> to_string in
+  let text = json |> member "text color" |> to_string in
+  let font = json |> member "font" |> to_string in
+  textarea#misc#modify_font_by_name font
