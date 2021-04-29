@@ -148,7 +148,7 @@ let font_response dialogue textarea resp =
     | _ -> ()
   end;
   textarea#misc#modify_font_by_name !font_name;
-  update_json {|"4, 4, 4"|} {|"4, 4, 4"|} ({|"|} ^ !font_name ^ {|"|});
+  update_json {|"4 4 4"|} {|"4 4 4"|} ({|"|} ^ !font_name ^ {|"|});
   dialogue#misc#hide ()
 
 let font_change textarea =

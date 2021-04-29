@@ -102,7 +102,10 @@ let rgbtuple_of_string str =
   let values = String.split_on_char ' ' str in
   match values with
   | h :: i :: j :: t ->
-      ( `RGB (int_of_string h, int_of_string i, int_of_string j)
+      ( `RGB
+          ( int_of_string (String.trim h),
+            int_of_string (String.trim i),
+            int_of_string (String.trim j) )
         : GDraw.color )
   | _ -> `BLACK
 
