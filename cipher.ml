@@ -17,19 +17,20 @@ let hex_of_int num =
   in
   aux num ""
 
-(** [ascii_to_hex str] is the string [str] converted into hexadecimal *)
-let ascii_to_hex str =
-  let char_lst = str |> String.to_seq |> List.of_seq in
-  String.concat ""
-    (List.map
-       (fun c -> int_of_char c |> Int64.of_int |> hex_of_int)
-       char_lst)
-
 (** [pad_length s str] is the string [str], except it has length [s],
     padded with zeros at the beginning if needed*)
 let pad_length s str =
   let len = String.length str in
   String.sub (String.make s '0' ^ str) len s
+
+(** [ascii_to_hex str] is the string [str] converted into hexadecimal *)
+let ascii_to_hex str =
+  let char_lst = str |> String.to_seq |> List.of_seq in
+  String.concat ""
+    (List.map
+       (fun c ->
+         int_of_char c |> Int64.of_int |> hex_of_int |> pad_length 2)
+       char_lst)
 
 let mod32val =
   let rec gen c acc =
@@ -57,9 +58,8 @@ let init_subkeys key =
   let j = ref 0 in
   for i = 0 to 17 do
     if !j + 8 >= len then j := 0;
-    print_endline hex_key;
-    print_endline (string_of_int !j);
-    print_endline !subkeys.(i);
+    (* print_endline hex_key; print_endline (string_of_int !j);
+       print_endline !subkeys.(i); *)
     !subkeys.(i) <-
       hex_of_int
         (Int64.logxor
@@ -183,7 +183,11 @@ let block_list p e =
 let hex_to_ascii h =
   let rec hex_to_ascii_helper h acc =
     let len = String.length h in
-    if len = 2 then
+    if len = 1 then
+      acc
+      ^ ("0" ^ String.sub h 0 1
+        |> int_of_hex |> Int64.to_int |> Char.chr |> String.make 1)
+    else if len = 2 then
       acc
       ^ (String.sub h 0 2 |> int_of_hex |> Int64.to_int |> Char.chr
        |> String.make 1)
@@ -209,22 +213,54 @@ let rec decrypt_block b r =
   if r <> 1 then decrypt_block (round r b) (r - 1)
   else post_processing_d b
 
-let encrypt k p =
-  init_subkeys k;
-  init_sboxes ();
-  let bl = block_list p true in
-  let rec encrypt_blocks acc = function
-    | [] -> acc
-    | h :: t -> encrypt_blocks (acc ^ encrypt_block h 0) t
-  in
-  encrypt_blocks "" bl
+(*let encrypt k p = init_subkeys k; init_sboxes (); let bl = block_list
+  p true in let rec encrypt_blocks acc = function | [] -> acc | h :: t
+  -> encrypt_blocks (acc ^ encrypt_block h 0) t in encrypt_blocks "" bl
 
-let decrypt k c =
-  init_subkeys k;
-  init_sboxes ();
-  let bl = block_list c false in
-  let rec decrypt_blocks acc = function
-    | [] -> acc
-    | h :: t -> decrypt_blocks (acc ^ decrypt_block h 17) t
+  let decrypt k c = init_subkeys k; init_sboxes (); let bl = block_list
+  c false in let rec decrypt_blocks acc = function | [] -> acc | h :: t
+  -> decrypt_blocks (acc ^ decrypt_block h 17) t in hex_to_ascii
+  (decrypt_blocks "" bl) *)
+
+let ceasar s str e =
+  let shift = ref 0 in
+  let const = ref 0 in
+  if e then shift := s else shift := -s;
+  if e then () else const := 128;
+  let rec aux curr acc =
+    let len = String.length curr in
+    if len <> 0 then
+      let new_let =
+        ((String.get curr 0 |> Char.code) + !shift + !const) mod 128
+        |> Char.chr |> String.make 1
+      in
+      aux (String.sub curr 1 (len - 1)) (acc ^ new_let)
+    else acc
   in
-  hex_to_ascii (decrypt_blocks "" bl)
+  aux str ""
+
+(* Temporary encryption soloution: Uses a modified version of the ceasar
+   cipher*)
+let encrypt_temp k p =
+  let rec encrypt_aux pass acc =
+    let len = String.length pass in
+    if len <> 0 then
+      let shift = String.get pass 0 |> Char.code in
+      encrypt_aux (String.sub pass 1 (len - 1)) (ceasar shift acc true)
+    else acc
+  in
+  encrypt_aux k p
+
+let decrypt_temp k c =
+  let rec decrypt_aux pass acc =
+    let len = String.length pass in
+    if len <> 0 then
+      let shift = String.get pass (len - 1) |> Char.code in
+      decrypt_aux (String.sub pass 0 (len - 1)) (ceasar shift acc false)
+    else acc
+  in
+  decrypt_aux k c
+
+let encrypt k p = encrypt_temp k p
+
+let decrypt k c = decrypt_temp k c

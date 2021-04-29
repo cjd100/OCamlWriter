@@ -29,9 +29,9 @@ let block_list_test name str lst =
 
 let cipher_tests =
   [
-    encrypt_test "Encrypt a message" "password"
-      "test message this is a test this is a test"
-      "3166745973726b2b2f47466d6267704368414e647a636244644a6246703637675738444a6d524d703652696e6f76557333493847364a594d5747704837434635";
+    (*encrypt_test "Encrypt a message" "password" "test message this is
+      a test this is a test"
+      "3166745973726b2b2f47466d6267704368414e647a636244644a6246703637675738444a6d524d703652696e6f76557333493847364a594d5747704837434635";*)
     block_list_test "list test"
       "test message this is a test this is a test"
       [
@@ -47,6 +47,96 @@ let cipher_tests =
     cipher_test "Encrypt and decrypt a message 2" "supersafepassword"
       "SUPER SECRET GOVERNMENT ENCRYPED MESSAGE: Who ate the last \
        slice of whitehouse pizza????";
+    cipher_test "Encrypt and decrypt a message 3"
+      "verylongandintricatepassword"
+      "According to all known laws\n\
+      \       of aviation,\n\
+      \       \n\
+      \         \n\
+      \       there is no way a bee\n\
+      \       should be able to fly.\n\
+      \       \n\
+      \         \n\
+      \       Its wings are too small to get\n\
+      \       its fat little body off the ground.\n\
+      \       \n\
+      \         \n\
+      \       The bee, of course, flies anyway\n\
+      \       \n\
+      \         \n\
+      \       because bees don't care\n\
+      \       what humans think is impossible.\n\
+      \       \n\
+      \         \n\
+      \       Yellow, black. Yellow, black.\n\
+      \       Yellow, black. Yellow, black.\n\
+      \       \n\
+      \         \n\
+      \       Ooh, black and yellow!\n\
+      \       Let's shake it up a little.\n\
+      \       \n\
+      \         \n\
+      \       Barry! Breakfast is ready!\n\
+      \       \n\
+      \       ";
+    cipher_test "lowercase alphanumeric 1" "aabb09182736ccdd"
+      "123456abcd132536";
+    cipher_test "lowercase alphanumeric 2" "abab12345920"
+      "12930bcdfe39120";
+    cipher_test "lowercase alphanumeric 3" "abazb12345920"
+      "12930bcdfe39120";
+    cipher_test "lowercase alphanumeric 4" "abazb12345920"
+      "12930bcdfez39120";
+    cipher_test "uppercase alphanumeric 1" "ABAZB12345920"
+      "12930BCDFEZ39120";
+    cipher_test "uppercase punctuation alphanumeric 1" "ABAZB1234,,5920"
+      "12930:   BCDF,EZ39120";
+    cipher_test "uppercase & lowercase alphanumeric 1" "ABazB12345920"
+      "12930BcdfEZ39120";
+    cipher_test "Bee movie - simple passwords" "abazb12345920"
+      "According to all known laws\n\
+      \       of aviation,\n\
+      \       \n\
+      \         \n\
+      \       there is no way a bee\n\
+      \       should be able to fly.\n\
+      \       \n\
+      \         \n\
+      \       Its wings are too small to get\n\
+      \       its fat little body off the ground.\n\
+      \       \n\
+      \         \n\
+      \       The bee, of course, flies anyway\n\
+      \       \n\
+      \         \n\
+      \       because bees don't care\n\
+      \       what humans think is impossible.\n\
+      \       \n\
+      \         \n\
+      \       Yellow, black. Yellow, black.\n\
+      \       Yellow, black. Yellow, black.\n\
+      \       \n\
+      \         \n\
+      \       Ooh, black and yellow!\n\
+      \       Let's shake it up a little.\n\
+      \       \n\
+      \         \n\
+      \       Barry! Breakfast is ready!\n\
+      \       \n\
+      \       ";
+    cipher_test "Bee movie - simple passwords - unspaced"
+      "abazb12345920"
+      "According to all known lawsof aviation,there is no way a \
+       beeshould be able to fly.Its wings are too small to getits fat \
+       little body off the ground.The bee, of course, flies \
+       anywaybecause bees don't carewhat humans think is \
+       impossible.Yellow, black. Yellow, black.Yellow, black. Yellow, \
+       black.Ooh, black and yellow!Let's shake it up a little.Barry! \
+       Breakfast is ready!";
+    cipher_test "Random password, simple text"
+      "someweird random password" "abebasb312313bb3123bbdasd";
+    cipher_test "short even length" "abazb12345920" "ah";
+    cipher_test "short odd length" "abazb12345920" "aha";
   ]
 
 let suite =
