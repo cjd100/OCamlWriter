@@ -1,6 +1,6 @@
 let update_json bg t fn fs =
   let t =
-    {|{"background color" : bg, "text color": t, "font" : {"name" : fn, "size" : fs}}|}
+    {|{"background color" : "bg", "text color": "t", "font" : {"name" : "fn", "size" : "fs"}}|}
   in
   Yojson.Basic.to_file "current_state.json" (Yojson.Basic.from_string t)
 
@@ -8,24 +8,24 @@ let preset_theme textarea bg text =
   textarea#misc#modify_base
     [
       ( `NORMAL,
-        ( bg
+        (bg
           : [ `BLACK
             | `COLOR of Gdk.color
             | `NAME of string
             | `RGB of int * int * int
             | `WHITE
-            ] ) );
+            ]) );
     ];
   textarea#misc#modify_text
     [
       ( `NORMAL,
-        ( text
+        (text
           : [ `BLACK
             | `COLOR of Gdk.color
             | `NAME of string
             | `RGB of int * int * int
             | `WHITE
-            ] ) );
+            ]) );
     ];
   ()
 
