@@ -1,10 +1,24 @@
-let update_json bg t fn fs =
-  let str =
-    {|{"background color" : |} ^ bg ^ {|, "text color": |} ^ t
-    ^ {|, "font" : {"name" : |} ^ fn ^ {|, "size" : |} ^ fs ^ {|}}}|}
-  in
-  Yojson.Basic.to_file "current_state.json"
-    (Yojson.Basic.from_string str)
+let update_json bg t f =
+  let split_font = String.split_on_char ' ' f in
+  match split_font with
+  | [] -> ()
+  | [ h ] -> ()
+  | h :: i :: tail ->
+      let fn = h in
+      let fs = i in
+      let str =
+        {|{"background color" : |} ^ bg ^ {|, "text color": |} ^ t
+        ^ {|, "font" : {"name" : |} ^ fn ^ {|, "size" : |} ^ fs
+        ^ {|}}}|}
+      in
+      Yojson.Basic.to_file "current_state.json"
+        (Yojson.Basic.from_string str)
+
+let string_of_rgbtuple = function
+  | (`RGB (r, g, b) : GDraw.color) ->
+      {|["|} ^ string_of_int r ^ {|", "|} ^ string_of_int g ^ {|", "|}
+      ^ string_of_int b ^ {|"]|}
+  | _ -> ""
 
 let preset_theme textarea bg text =
   textarea#misc#modify_base
@@ -47,6 +61,9 @@ let background_response dialogue textarea resp =
     | _ -> ()
   end;
   textarea#misc#modify_base [ (`NORMAL, !bg_color) ];
+  update_json
+    ({|"|} ^ string_of_rgbtuple !bg_color ^ {|"|})
+    {|"test"|} {|"test"|};
   dialogue#misc#hide ()
 
 (* Opens the color palette and outputs changes in color for modification
@@ -92,6 +109,9 @@ let text_response dialogue textarea resp =
     | _ -> ()
   end;
   textarea#misc#modify_text [ (`NORMAL, !text_color) ];
+  update_json {|"test"|}
+    ({|"|} ^ string_of_rgbtuple !text_color ^ {|"|})
+    {|"test"|};
   dialogue#misc#hide ()
 
 let text_color_change textarea =
@@ -134,9 +154,7 @@ let font_response dialogue textarea resp =
     | _ -> ()
   end;
   textarea#misc#modify_font_by_name !font_name;
-  update_json {|"test"|} {|"test"|}
-    ({|"|} ^ !font_name ^ {|"|})
-    {|"test"|};
+  update_json {|"test"|} {|"test"|} ({|"|} ^ !font_name ^ {|"|});
   dialogue#misc#hide ()
 
 let font_change textarea =
