@@ -60,3 +60,6 @@ val text_color_change :
     of the text area text *)
 val font_change :
   < misc : < modify_font_by_name : string -> 'a ; .. > ; .. > -> unit
+
+(** Retrieves settings previously applied before exiting the editor *)
+val from_json : Yojson.Basic.t -> string

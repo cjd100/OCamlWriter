@@ -148,7 +148,7 @@ let font_response dialogue textarea resp =
     | _ -> ()
   end;
   textarea#misc#modify_font_by_name !font_name;
-  update_json {|"test"|} {|"test"|} ({|"|} ^ !font_name ^ {|"|});
+  update_json {|"4, 4, 4"|} {|"4, 4, 4"|} ({|"|} ^ !font_name ^ {|"|});
   dialogue#misc#hide ()
 
 let font_change textarea =
@@ -174,12 +174,8 @@ let font_change textarea =
   ignore (fontdlg#run ());
   ()
 
-let rgbtuple_of_string str =
-  let values = String.split_on_char ' ' str in
-  match values with h :: i :: j :: t -> (h, i, j)
-
-let from_json textarea json =
+let from_json json =
   let background = json |> member "background color" |> to_string in
   let text = json |> member "text color" |> to_string in
   let font = json |> member "font" |> to_string in
-  textarea#misc#modify_font_by_name font
+  background ^ "%" ^ text ^ "%" ^ font
