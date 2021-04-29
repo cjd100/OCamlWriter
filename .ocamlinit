@@ -1,8 +1,9 @@
 #require "ounit2";;
+#require "str";;
 #require "lablgtk2";;
 #require "core";;
 #require "yojson";;
 #require "stack";;
 #load "gui.cmo";;
-#load "file.cmo"
+#load "file.cmo";;
 

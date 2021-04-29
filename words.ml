@@ -24,7 +24,6 @@ let split_and_trim s =
   let escaped = String.escaped s in
   let split = String.split_on_char ' ' escaped in
   let x = List.map (fun s -> String.trim s) split in
-  print_endline (pp_list pp_string x);
   x
 
 (* count length of list of words *)
@@ -33,6 +32,6 @@ let word_count s =
   let filtered =
     List.filter
       (fun s -> s <> "" && s <> "\t" && s <> "\n")
-      (split_and_trim s)
+      (Str.split (Str.regexp "[ \n\r\x0c\t]+") s)
   in
   List.length filtered

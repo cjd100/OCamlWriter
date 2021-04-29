@@ -4,7 +4,7 @@ MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
 TEST=test.byte 
 MAIN=gui.byte
-OCAMLBUILD=ocamlbuild -use-ocamlfind -r -tag thread
+OCAMLBUILD=ocamlbuild -use-ocamlfind -r -tag thread -package str
 
 default: build 
 	OCAMLRUNPARAM=b utop
@@ -22,7 +22,7 @@ gui_temp:
 	rm gui
 
 build:
-	$(OCAMLBUILD) $(OBJECTS)
+	$(OCAMLBUILD) $(OBJECTS) -package str
 
 test:
 	$(OCAMLBUILD) -tag 'debug' $(TEST) && ./$(TEST) -runner sequential
