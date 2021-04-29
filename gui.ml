@@ -89,7 +89,7 @@ let load_file parent text_area =
   end;
   open_file_window#destroy ()
 
-let save name text =
+let save parent_container name text =
   Stack.push text state;
   word_count := Words.word_count text;
   File.save_to_file name text
@@ -103,8 +103,8 @@ let rgbtuple_of_string str =
   let values = String.split_on_char ' ' str in
   match values with
   | h :: i :: j :: t ->
-      ( `RGB (int_of_string h, int_of_string i, int_of_string j)
-        : GDraw.color )
+      (`RGB (int_of_string h, int_of_string i, int_of_string j)
+        : GDraw.color)
   | _ -> `BLACK
 
 let load_settings textarea =
@@ -183,7 +183,7 @@ let main () =
          load_file editor_window text_field));
   ignore
     (factory#add_item "Save" ~key:_S ~callback:(fun () ->
-         save !curr_file (text_field#buffer#get_text ())));
+         save container !curr_file (text_field#buffer#get_text ())));
   ignore
     (factory#add_item "Open file" ~key:_O ~callback:(fun () ->
          load_file editor_window text_field));
