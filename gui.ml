@@ -91,6 +91,7 @@ let load_file parent text_area =
 
 let save name text =
   Stack.push text state;
+  word_count := Words.word_count text;
   File.save_to_file name text
 
 let undo parent text_area =
