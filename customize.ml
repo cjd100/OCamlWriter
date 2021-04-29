@@ -179,3 +179,5 @@ let font_change textarea =
 
   ignore (fontdlg#run ());
   ()
+
+let from_json textarea json = failwith "Unimplemented"
