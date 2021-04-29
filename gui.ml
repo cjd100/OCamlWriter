@@ -91,7 +91,8 @@ let load_file parent file_label word_label text_area =
         word_count := Words.word_count (File.open_to_string filename);
         insert_label_text filename file_label;
         insert_count !word_count word_label;
-        state = Stack.create ();
+        ignore (state = Stack.create ());
+        (* ignored *)
         Stack.push (File.open_to_string filename) state;
         ignore (insert_text (File.open_to_string filename) text_area)
     | `NEW -> ignore (new_file open_file_window text_area)
