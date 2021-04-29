@@ -91,6 +91,8 @@ let load_file parent file_label word_label text_area =
         word_count := Words.word_count (File.open_to_string filename);
         insert_label_text filename file_label;
         insert_count !word_count word_label;
+        state = Stack.create ();
+        Stack.push (File.open_to_string filename) state;
         ignore (insert_text (File.open_to_string filename) text_area)
     | `NEW -> ignore (new_file open_file_window text_area)
     (*why is it partial?*)
@@ -114,11 +116,11 @@ let rgbtuple_of_string str =
   let values = String.split_on_char ' ' str in
   match values with
   | h :: i :: j :: t ->
-      ( `RGB
-          ( int_of_string (String.trim h),
-            int_of_string (String.trim i),
-            int_of_string (String.trim j) )
-        : GDraw.color )
+      (`RGB
+         ( int_of_string (String.trim h),
+           int_of_string (String.trim i),
+           int_of_string (String.trim j) )
+        : GDraw.color)
   | _ -> `WHITE
 
 let load_settings textarea =
