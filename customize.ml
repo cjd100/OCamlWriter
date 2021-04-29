@@ -3,7 +3,7 @@ open Yojson.Basic.Util
 let update_json bg t f =
   let str =
     {|{"background color" : |} ^ bg ^ {|, "text color": |} ^ t
-    ^ {|, "font" : |} ^ f ^ {|}|}
+    ^ {|, "font" : |} ^ f ^ "}"
   in
   Yojson.Basic.to_file "current_state.json"
     (Yojson.Basic.from_string str)
