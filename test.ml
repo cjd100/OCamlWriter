@@ -2,6 +2,7 @@ open OUnit2
 open File
 open Cipher
 open Yojson
+open Words
 
 let ex_json = Yojson.Basic.from_file "current_state.json"
 
@@ -26,6 +27,14 @@ let block_list_test name str lst =
   name >:: fun _ ->
   assert_equal lst (block_list str true)
     ~printer:(List.fold_left (fun a acc -> a ^ " " ^ acc) "")
+
+let word_count_test name result str =
+  name >:: fun _ ->
+  assert_equal result (Words.word_count str) ~printer:string_of_int
+
+let char_count_test name result str =
+  name >:: fun _ ->
+  assert_equal result (Words.char_count str) ~printer:string_of_int
 
 let cipher_tests =
   [
@@ -139,8 +148,28 @@ let cipher_tests =
     cipher_test "short odd length" "abazb12345920" "aha";
   ]
 
+(* tests for Word compilation unit. Tests word counting functionality
+   for various types of strings *)
+let word_tests =
+  [
+    word_count_test "empty str" 0 "";
+    word_count_test "string with one space" 0 " ";
+    word_count_test "string with newline and space" 0 " \n";
+    word_count_test "string of 1 character" 1 "a";
+    word_count_test "string with word" 1 "hello!!!";
+    word_count_test "multiple words" 6 "hi my name is michael clarkson";
+    word_count_test "multiple words with a newline in it" 6
+      "hi my name \n is michael clarkson";
+    char_count_test "empty str" 0 "";
+    char_count_test "space str" 0 " ";
+    char_count_test "string with newline and space" 0 " \n";
+    char_count_test "string with 1 word" 6 "hello!";
+    char_count_test "string with a few words" 8 "hi my name";
+    char_count_test "string with words and newlines" 8 "hi my \n name";
+  ]
+
 let suite =
   "test suite for MS1"
-  >::: List.flatten [ file_tests; gui_tests; cipher_tests ]
+  >::: List.flatten [ file_tests; gui_tests; cipher_tests; word_tests ]
 
 let _ = run_test_tt_main suite
