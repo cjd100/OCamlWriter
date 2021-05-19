@@ -95,6 +95,7 @@ let load_file parent file_label word_label text_area =
         char_count := Words.char_count (File.open_to_string filename);
         insert_label_text filename file_label;
         insert_counts !word_count !char_count word_label;
+        Stack.clear state;
         ignore (state = Stack.create ());
         (* ignored *)
         Stack.push (File.open_to_string filename) state;
@@ -141,26 +142,30 @@ let cipher_window text_area text (encrypt : bool) =
       else decrypt_file text_entry#text text_area text password_input ());
   password_input#show
 
-let save word_label name text =
-  Stack.push text state;
-  changed := true;
-  Stack.iter print_endline state;
+let save word_label name text_area text =
   word_count := Words.word_count text;
   char_count := Words.char_count text;
   insert_counts !word_count !char_count word_label;
-  File.save_to_file name text
+  File.save_to_file name text;
+  if text != Stack.top state then Stack.push text state else ()
 
 (* if false then match Stack.top_opt state with | None -> () | Some text
    -> insert_text text text_area else *)
 let undo parent text_area =
-  print_endline (string_of_bool !changed);
-  changed := false;
-  if Stack.length state = 1 then insert_text (Stack.top state) text_area
-  else if !changed = true then ignore (Stack.pop_opt state)
-  else ();
-  match Stack.pop_opt state with
-  | None -> ()
-  | Some text -> insert_text text text_area
+  if Stack.length state = 1 then
+    let text = Stack.top state in
+    insert_text text text_area
+  else ignore (Stack.pop_opt state);
+  if Stack.length state = 1 then
+    let text = Stack.top state in
+    insert_text text text_area
+  else
+    match Stack.pop_opt state with
+    | None -> ()
+    | Some text -> insert_text text text_area
+(*if Stack.length state = 1 then insert_text (Stack.top state) text_area
+  else if !changed = true then match Stack.pop_opt state with | None ->
+  () | Some text -> insert_text text text_area else (); changed := false*)
 
 let rgbtuple_of_string str =
   let values = String.split_on_char ' ' str in
@@ -248,7 +253,8 @@ let main () =
          load_file editor_window file_label word_label text_field));
   ignore
     (factory#add_item "Save" ~key:_S ~callback:(fun () ->
-         save word_label !curr_file (text_field#buffer#get_text ())));
+         save word_label !curr_file text_field
+           (text_field#buffer#get_text ())));
   ignore
     (factory#add_item "Open file" ~key:_O ~callback:(fun () ->
          load_file editor_window file_label word_label text_field));

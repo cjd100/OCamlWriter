@@ -175,6 +175,8 @@ let word_tests =
     char_count_test "string with 1 word" 6 "hello!";
     char_count_test "string with a few words" 8 "hi my name";
     char_count_test "string with words and newlines" 8 "hi my \n name";
+    char_count_test "string with only whitespace characters" 0
+      " \n\n \t \t \x0c";
   ]
 
 let suite =
