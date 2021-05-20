@@ -26,8 +26,14 @@ let split_and_trim s =
   let x = List.map (fun s -> String.trim s) split in
   x
 
-(* count length of list of words *)
+(* Removes duplicates from a list *)
+let remove_dups lst =
+  (* create hashtbl to hold seen things *)
+  let seen = Hashtbl.create (List.length lst) in
+  List.iter (fun x -> Hashtbl.replace seen x ()) lst;
+  Hashtbl.fold (fun h () t -> h :: t) seen []
 
+(* count length of list of words *)
 let word_count s =
   let filtered =
     List.filter
@@ -37,9 +43,18 @@ let word_count s =
   List.length filtered
 
 (* counts the length of any string in characters, minus any whitespace
-   characters. Needs to start at 1, not 0 *)
+   characters *)
 let char_count str =
   let filtered =
     Str.global_replace (Str.regexp "[ \n\r\x0c\t]+") "" str
   in
   String.length filtered
+
+(* Counts the number of unique words in a string *)
+let uniq_count s =
+  let filtered =
+    List.filter
+      (fun s -> s <> "" && s <> "\t" && s <> "\n")
+      (Str.split (Str.regexp "[ \n\r\x0c\t]+") s)
+  in
+  List.length (remove_dups filtered)

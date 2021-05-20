@@ -45,6 +45,10 @@ let char_count_test name result str =
   name >:: fun _ ->
   assert_equal result (Words.char_count str) ~printer:string_of_int
 
+let uniq_count_test name result str =
+  name >:: fun _ ->
+  assert_equal result (Words.uniq_count str) ~printer:string_of_int
+
 let cipher_tests =
   [
     (*encrypt_test "Encrypt a message" "password" "test message this is
@@ -177,6 +181,17 @@ let word_tests =
     char_count_test "string with words and newlines" 8 "hi my \n name";
     char_count_test "string with only whitespace characters" 0
       " \n\n \t \t \x0c";
+    (* uniq_count tests *)
+    uniq_count_test "empty str" 0 "";
+    uniq_count_test "string with a space" 0 " ";
+    uniq_count_test "string with random whitespace chars" 0
+      " \n\n \t \t \x0c";
+    uniq_count_test "string with 1 word" 1 "hello";
+    uniq_count_test "string with 2 of the same word" 1 "hello hello";
+    uniq_count_test "string with multiple words" 3
+      "hi asasasd clarkson \t";
+    uniq_count_test "string with multiple words and weird whitespace" 4
+      "a bbbbb cc\t\nasd a";
   ]
 
 let suite =
