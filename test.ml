@@ -3,6 +3,7 @@ open File
 open Cipher
 open Yojson
 open Words
+open Regex
 
 let ex_json = Yojson.Basic.from_file "current_state.json"
 
@@ -48,6 +49,18 @@ let char_count_test name result str =
 let uniq_count_test name result str =
   name >:: fun _ ->
   assert_equal result (Words.uniq_count str) ~printer:string_of_int
+
+let replace_test name reg rep str result exact =
+  let replace =
+    if exact then Regex.replace_exact else Regex.replace_reg
+  in
+  name >:: fun _ ->
+  assert_equal result (replace reg rep str) ~printer:(fun a -> a)
+
+let find_test name reg str ind result exact =
+  let find = if exact then Regex.find_exact else Regex.find_reg in
+  name >:: fun _ ->
+  assert_equal result (find reg str ind) ~printer:string_of_int
 
 let cipher_tests =
   [
@@ -194,8 +207,57 @@ let word_tests =
       "a bbbbb cc\t\nasd a";
   ]
 
+let regex_tests =
+  [
+    replace_test "Replace the word Jeff with [Redacted]" "Jeff"
+      "[Redacted]"
+      "Jeff went to the store, where Jeff purchased many Jeff"
+      "[Redacted] went to the store, where [Redacted] purchased many \
+       [Redacted]"
+      true;
+    replace_test "Delete any string that is enclosed by lowercase a's"
+      "[a].*?[a]" "" "a this will be deleted, a but not this!"
+      " but not this!" false;
+    replace_test
+      "Replaces the word secret with letters in between it with the \
+       word secret"
+      "s.*e.*c.*r.*e.*t" "secret" "This is the secret message"
+      "Thisecret message" false;
+    replace_test "Replaces fizz with buzz, string does not contain fizz"
+      "fizz" "buzz" "just some string" "just some string" true;
+    replace_test "Replaces fizz with buzz" "fizz" "buzz"
+      "fizzbuzz fizzbuzz fizz the buzz"
+      "buzzbuzz buzzbuzz buzz the buzz" true;
+    find_test "Find the first occurence of Waldo" "Waldo"
+      "Noah Emma Oliver Ava Elijah Waldo William Sophia James Amelia \
+       Benjamin Isabella Lucas Mia Henry Evelyn Alexander Harper"
+      0 28 true;
+    find_test "Find the first occurence of Waldo starting at index 28"
+      "Waldo"
+      "Noah Emma Oliver Ava Elijah Waldo William Sophia James Amelia \
+       Benjamin Isabella Lucas Mia Henry Evelyn Alexander Harper"
+      28 28 true;
+    find_test "Find the first occurence of Waldo starting at index 29"
+      "Waldo"
+      "Noah Emma Oliver Ava Elijah Waldo William Sophia James Amelia \
+       Benjamin Isabella Lucas Mia Henry Evelyn Alexander Harper"
+      29 ~-1 true;
+    replace_test
+      "Replace all phone numbers with [Redacted] (formatted as \
+       ###-###-####)"
+      "<[0-9]>{3}-<[0-9]>{3}-<[0-9]>{4}" "[Redacted]"
+      "Call 800-999-1234 for a free autoquote today! For inquiries \
+       with our legal team, dial 786-123-4567"
+      "Call [Redacted] for a free autoquote today! For inquiries with \
+       our legal team, dial [Redacted]"
+      false;
+  ]
+
 let suite =
   "test suite for MS1"
-  >::: List.flatten [ file_tests; gui_tests; cipher_tests; word_tests ]
+  >::: List.flatten
+         [
+           file_tests; gui_tests; cipher_tests; word_tests; regex_tests;
+         ]
 
 let _ = run_test_tt_main suite
