@@ -251,6 +251,19 @@ let regex_tests =
       "Call [Redacted] for a free autoquote today! For inquiries with \
        our legal team, dial [Redacted]"
       false;
+    find_test "Find the first instance of a phone number in a string"
+      "<[0-9]>{3}-<[0-9]>{3}-<[0-9]>{4}"
+      "Call 800-999-1234 for a free autoquote today! For inquiries \
+       with our legal team, dial 786-123-4567"
+      0 5 false;
+    find_test
+      "Password verification regex: password is 8 characters long, and \
+       only contains letters and numbers. Valid password"
+      "<[A-Za-z0-9]>{8}" "p455w0rd" 0 0 false;
+    find_test
+      "Password verification regex: password is 8 characters long, and \
+       only contains letters and numbers. Invalid password"
+      "<[A-Za-z0-9]>{8}" "P&assw0rd" 0 ~-1 false;
   ]
 
 let suite =

@@ -71,7 +71,7 @@ let replace_reg reg_s n str =
   replace reg n str
 
 let find_reg reg_s str ind =
-  let reg = regexp reg_s in
+  let reg = regexp (extended_regex reg_s) in
   find reg str ind
 
 let replace_exact r n str =

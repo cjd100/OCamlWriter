@@ -149,6 +149,31 @@ let cipher_window text_area text (encrypt : bool) =
       else decrypt_file text_entry#text text_area text password_input ());
   password_input#show
 
+(** Highlights the first instance of the regular expression [reg] in the
+    text box past the cursor location *)
+let regex_find text_area reg parent = failwith ""
+
+let regex_find_window text_area text (encrypt : bool) =
+  let title = "Find" in
+  let password_input =
+    GWindow.window ~width:400 ~height:200 ~title ()
+  in
+  let container = GPack.vbox ~packing:password_input#add () in
+  ignore
+    (password_input#connect#destroy ~callback:password_input#destroy);
+  let text_entry =
+    GEdit.entry ~packing:container#add ~width:350 ~height:100 ()
+  in
+
+  let confirm_button =
+    GButton.button ~stock:`APPLY ~packing:container#add ()
+  in
+  confirm_button#connect#clicked ~callback:(fun () ->
+      if encrypt then
+        encrypt_file text_entry#text text_area text password_input ()
+      else decrypt_file text_entry#text text_area text password_input ());
+  password_input#show
+
 let save word_label name text_area text =
   word_count := Words.word_count text;
   char_count := Words.char_count text;
@@ -218,6 +243,7 @@ let main () =
   let accel_group = factory#accel_group in
   (* Submenus *)
   let file_menu = factory#add_submenu "File" in
+  let edit_menu = factory#add_submenu "Edit" in
   let theme_menu = factory#add_submenu "Themes" in
   let encryption_menu = factory#add_submenu "Encryption" in
 
@@ -266,10 +292,13 @@ let main () =
   ignore
     (factory#add_item "Open file" ~key:_O ~callback:(fun () ->
          load_file editor_window file_label word_label text_field));
+  ignore (factory#add_item "Quit" ~key:_Q ~callback:Main.quit);
+
+  (* Edit menu *)
+  let factory = new GMenu.factory edit_menu ~accel_group in
   ignore
     (factory#add_item "Undo" ~key:_Z ~callback:(fun () ->
          undo editor_window text_field));
-  ignore (factory#add_item "Quit" ~key:_Q ~callback:Main.quit);
 
   (* Theme menu *)
   let factory = new GMenu.factory theme_menu ~accel_group in
