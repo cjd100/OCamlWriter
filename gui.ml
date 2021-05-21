@@ -146,11 +146,12 @@ let decrypt_file pass text_area text parent =
   parent#destroy
 
 let cipher_window text_area text (encrypt : bool) =
-  let title = ref "" in
-  if encrypt then title := "Encryption: Input password"
-  else title := "Decryption: Input password";
+  let title =
+    if encrypt then "Encryption: Input password"
+    else "Decryption: Input password"
+  in
   let password_input =
-    GWindow.window ~width:400 ~height:200 ~title:!title ()
+    GWindow.window ~width:400 ~height:200 ~title ()
   in
   let container = GPack.vbox ~packing:password_input#add () in
   ignore
@@ -158,7 +159,6 @@ let cipher_window text_area text (encrypt : bool) =
   let text_entry =
     GEdit.entry ~packing:container#add ~width:350 ~height:100 ()
   in
-
   let confirm_button =
     GButton.button ~stock:`APPLY ~packing:container#add ()
   in
@@ -168,21 +168,25 @@ let cipher_window text_area text (encrypt : bool) =
       else decrypt_file text_entry#text text_area text password_input ());
   password_input#show
 
-(** [regex_find field reg] Highlights the first instance of the regular
-    expression [reg] in the text box [field] past the cursor location *)
-let regex_find (text_area : GText.view) (reg : string) (exact : bool) =
-  let find = if exact then Regex.find_exact else Regex.find_reg in
+let matched_length text reg exact =
   let replace_first =
     if exact then Regex.replace_exact_first else Regex.replace_reg_first
   in
+  String.length text - String.length (replace_first reg "" text)
+
+(** [regex_find field reg exact] Highlights the first instance of [reg]
+    in the text box [field] past the cursor location. If [exact] is
+    true, it will treat [reg] as a normal string, otherwise [reg] is
+    treated as a regular expression *)
+let regex_find (text_area : GText.view) (reg : string) (exact : bool) =
+  let find = if exact then Regex.find_exact else Regex.find_reg in
+
   let text = text_area#buffer#get_text () in
   let cursor_pos = text_area#buffer#cursor_position in
   let first_ind = find reg text cursor_pos in
 
-  let matched_length =
-    String.length text - String.length (replace_first reg "" text)
-  in
-  let end_pos = first_ind + matched_length in
+  let matched_len = matched_length text reg exact in
+  let end_pos = first_ind + matched_len in
   if first_ind = -1 then set_cursor_pos text_area (String.length text)
   else highlight_text text_area first_ind end_pos
 
@@ -199,12 +203,67 @@ let regex_find_window (text_area : GText.view) =
     GButton.check_button ~label:"Search by regex" ~packing:container#add
       ~active:false ()
   in
-
   let confirm_button =
     GButton.button ~stock:`FIND ~packing:container#add ()
   in
   confirm_button#connect#clicked ~callback:(fun () ->
       regex_find text_area text_entry#text (not mode#active));
+  reg_window#show
+
+(** [regex_replace area reg new_s exact all] is the same string
+    contained by the text area [area], except [reg] is replaced with the
+    string [new_s]. If [exact] is true, [reg] is treated like a normal
+    string, otherwise [reg] is treated like a regular expression. If
+    [all] is true, all instances of [reg] will be replaced, otherwise
+    only the next instance of [reg] is replaced. *)
+let rec regex_replace (text_area : GText.view) reg new_s exact all =
+  let replace = rep_fun exact all in
+  let cursor_pos = text_area#buffer#cursor_position in
+  let t = text_area#buffer#get_text () in
+  let text =
+    if all then t
+    else String.sub t cursor_pos (String.length t - cursor_pos)
+  in
+  let matched_len = matched_length text reg exact in
+  let text_head = if all then "" else String.sub t 0 cursor_pos in
+  insert_text (text_head ^ replace reg new_s text) text_area;
+  set_cursor_pos text_area (cursor_pos + matched_len)
+
+(** [rep_fun e a] is the proper replace function to use for the
+    [regex_replace] function*)
+and rep_fun e a =
+  match (e, a) with
+  | true, true -> Regex.replace_exact
+  | true, false -> Regex.replace_exact_first
+  | false, true -> Regex.replace_reg
+  | false, false -> Regex.replace_reg_first
+
+let regex_replace_window (text_area : GText.view) =
+  let title = "Replace" in
+  let reg_window = GWindow.window ~width:400 ~height:200 ~title () in
+  let container = GPack.vbox ~packing:reg_window#add () in
+  ignore (reg_window#connect#destroy ~callback:reg_window#destroy);
+  let regex_entry =
+    GEdit.entry ~packing:container#add ~width:350 ~height:100 ()
+  in
+  let with_entry =
+    GEdit.entry ~packing:container#add ~width:350 ~height:100 ()
+  in
+
+  let reg_mode =
+    GButton.check_button ~label:"Replace regex" ~packing:container#add
+      ~active:false ()
+  in
+  let all_mode =
+    GButton.check_button ~label:"Replace all" ~packing:container#add
+      ~active:false ()
+  in
+  let confirm_button =
+    GButton.button ~stock:`FIND_AND_REPLACE ~packing:container#add ()
+  in
+  confirm_button#connect#clicked ~callback:(fun () ->
+      regex_replace text_area regex_entry#text with_entry#text
+        (not reg_mode#active) all_mode#active);
   reg_window#show
 
 let save word_label name text_area text =
@@ -343,6 +402,9 @@ let main () =
   ignore
     (factory#add_item "Find" ~key:_F ~callback:(fun () ->
          regex_find_window text_field ()));
+  ignore
+    (factory#add_item "Replace" ~key:_R ~callback:(fun () ->
+         regex_replace_window text_field ()));
 
   (* Theme menu *)
   let factory = new GMenu.factory theme_menu ~accel_group in
