@@ -11,6 +11,8 @@ let curr_file = ref ""
    into main *)
 let state = Stack.create ()
 
+let undone = Stack.create ()
+
 let word_count = ref 0
 
 let char_count = ref 0
@@ -26,6 +28,12 @@ type curr_file_state = {
   name : string;
   func : unit;
 }
+
+let initialize_states =
+  Stack.clear state;
+  ignore (state = Stack.create ());
+  Stack.clear undone;
+  ignore (undone = Stack.create ())
 
 (* Initializes Gtk *)
 let init = GtkMain.Main.init ()
@@ -102,9 +110,8 @@ let load_file parent file_label word_label text_area =
         curr_file := filename;
         insert_label_text filename file_label;
         update_insert_counts (File.open_to_string filename) word_label;
-        Stack.clear state;
-        ignore (state = Stack.create ());
-        (* ignored *)
+        initialize_states;
+        (* Push initial text onto save stack *)
         Stack.push (File.open_to_string filename) state;
         ignore (insert_text (File.open_to_string filename) text_area)
     | `NEW -> ignore (new_file open_file_window text_area)
@@ -159,7 +166,8 @@ let save word_label name text_area text =
 
 (* if false then match Stack.top_opt state with | None -> () | Some text
    -> insert_text text text_area else *)
-let undo parent text_area =
+let undo parent text_area curr_text =
+  Stack.push curr_text undone;
   if Stack.length state = 1 then
     let text = Stack.top state in
     insert_text text text_area
@@ -171,9 +179,21 @@ let undo parent text_area =
     match Stack.pop_opt state with
     | None -> ()
     | Some text -> insert_text text text_area
-(*if Stack.length state = 1 then insert_text (Stack.top state) text_area
-  else if !changed = true then match Stack.pop_opt state with | None ->
-  () | Some text -> insert_text text text_area else (); changed := false*)
+
+let redo parent text_area curr_text =
+  Stack.push curr_text state;
+  if Stack.length undone = 1 then
+    let text = Stack.top undone in
+    insert_text text text_area
+  else ignore (Stack.pop_opt undone);
+  if Stack.length undone = 1 then
+    let text = Stack.top undone in
+    insert_text text text_area
+  else
+    match Stack.pop_opt undone with
+    | None -> ()
+    | Some text -> insert_text text text_area
+(* Adds most recently redone to the stack of actions [state] *)
 
 let rgbtuple_of_string str =
   let values = String.split_on_char ' ' str in
@@ -268,7 +288,10 @@ let main () =
          load_file editor_window file_label word_label text_field));
   ignore
     (factory#add_item "Undo" ~key:_Z ~callback:(fun () ->
-         undo editor_window text_field));
+         undo editor_window text_field (text_field#buffer#get_text ())));
+  ignore
+    (factory#add_item "Redo" ~key:_Y ~callback:(fun () ->
+         redo editor_window text_field (text_field#buffer#get_text ())));
   ignore (factory#add_item "Quit" ~key:_Q ~callback:Main.quit);
 
   (* Theme menu *)
