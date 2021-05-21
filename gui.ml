@@ -12,7 +12,7 @@ let curr_file = ref ""
    into main *)
 let state = Stack.create ()
 
-let undone = Stack.create ()
+let undone = ref ""
 
 let word_count = ref 0
 
@@ -33,8 +33,7 @@ type curr_file_state = {
 let initialize_states =
   Stack.clear state;
   ignore (state = Stack.create ());
-  Stack.clear undone;
-  ignore (undone = Stack.create ())
+  undone := ""
 
 (* Initializes Gtk *)
 let init = GtkMain.Main.init ()
@@ -212,10 +211,11 @@ let save word_label name text_area text =
   File.save_to_file name text;
   if text != Stack.top state then Stack.push text state else ()
 
-(* if false then match Stack.top_opt state with | None -> () | Some text
-   -> insert_text text text_area else *)
+(** [undo parent text_area curr_text] reverts the text in [text_area] in
+    the GUI to the prior save state. Can be done successively, reverting
+    file contents to what they were opened as *)
 let undo parent text_area curr_text =
-  Stack.push curr_text undone;
+  undone := curr_text;
   if Stack.length state = 1 then
     let text = Stack.top state in
     insert_text text text_area
@@ -228,20 +228,11 @@ let undo parent text_area curr_text =
     | None -> ()
     | Some text -> insert_text text text_area
 
+(** [redo parent text_area curr_text] reverts the text in [text_area]
+    such that it "redoes" the undo action taken previously*)
 let redo parent text_area curr_text =
   Stack.push curr_text state;
-  if Stack.length undone = 1 then
-    let text = Stack.top undone in
-    insert_text text text_area
-  else ignore (Stack.pop_opt undone);
-  if Stack.length undone = 1 then
-    let text = Stack.top undone in
-    insert_text text text_area
-  else
-    match Stack.pop_opt undone with
-    | None -> ()
-    | Some text -> insert_text text text_area
-(* Adds most recently redone to the stack of actions [state] *)
+  if !undone = "" then () else insert_text !undone text_area
 
 let rgbtuple_of_string str =
   let values = String.split_on_char ' ' str in
