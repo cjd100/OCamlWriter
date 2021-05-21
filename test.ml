@@ -5,6 +5,30 @@ open Yojson
 open Words
 open Regex
 
+let pp_string s = "\"" ^ s ^ "\""
+
+(** [pp_list pp_elt lst] pretty-prints list [lst], using [pp_elt] to
+    pretty-print each element of [lst]. *)
+let pp_list pp_elt lst =
+  let pp_elts lst =
+    let rec loop n acc = function
+      | [] -> acc
+      | [ h ] -> acc ^ pp_elt h
+      | h1 :: (h2 :: t as t') ->
+          if n = 100 then acc ^ "..." (* stop printing long list *)
+          else loop (n + 1) (acc ^ pp_elt h1 ^ "; ") t'
+    in
+    loop 0 "" lst
+  in
+  "[" ^ pp_elts lst ^ "]"
+
+let cmp_set_like_lists lst1 lst2 =
+  let uniq1 = List.sort_uniq compare lst1 in
+  let uniq2 = List.sort_uniq compare lst2 in
+  List.length lst1 = List.length uniq1
+  && List.length lst2 = List.length uniq2
+  && uniq1 = uniq2
+
 let ex_json = Yojson.Basic.from_file "current_state.json"
 
 (*let json_to_file_test json = assert_equal (Yojson.Basic.from_file
@@ -49,6 +73,11 @@ let char_count_test name result str =
 let uniq_count_test name result str =
   name >:: fun _ ->
   assert_equal result (Words.uniq_count str) ~printer:string_of_int
+
+let remove_dups_test name result lst =
+  name >:: fun _ ->
+  assert_equal result (Words.remove_dups lst) ~cmp:cmp_set_like_lists
+    ~printer:(pp_list pp_string)
 
 let replace_test name reg rep str result exact =
   let replace =
@@ -205,6 +234,14 @@ let word_tests =
       "hi asasasd clarkson \t";
     uniq_count_test "string with multiple words and weird whitespace" 4
       "a bbbbb cc\t\nasd a";
+    (* remove_dups tests *)
+    remove_dups_test "empty list" [] [];
+    remove_dups_test "list with 1 elt" [ "a" ] [ "a" ];
+    remove_dups_test "list with 2 of the same elt" [ "a" ] [ "a"; "a" ];
+    remove_dups_test "list with different elements" [ "a"; "b" ]
+      [ "a"; "b" ];
+    remove_dups_test "more complicated list" [ "a"; "b"; "c" ]
+      [ "a"; "a"; "b"; "b"; "c" ];
   ]
 
 let regex_tests =
