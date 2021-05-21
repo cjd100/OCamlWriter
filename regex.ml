@@ -1,7 +1,8 @@
 open Str
 
 (** Introduces additional regex constructs that are not included in
-    OCaml's Str module by default. *)
+    OCaml's Str module by default. New constructs: <A>{I} will match the
+    string A, repeated I times. *)
 let rec extended_regex str =
   let multi_match =
     mult str

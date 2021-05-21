@@ -195,8 +195,11 @@ let regex_find_window (text_area : GText.view) =
   let reg_window = GWindow.window ~width:400 ~height:200 ~title () in
   let container = GPack.vbox ~packing:reg_window#add () in
   ignore (reg_window#connect#destroy ~callback:reg_window#destroy);
+  let find_label =
+    GMisc.label ~text:"Find: " ~packing:container#pack ~height:20 ()
+  in
   let text_entry =
-    GEdit.entry ~packing:container#add ~width:350 ~height:100 ()
+    GEdit.entry ~packing:container#add ~width:350 ~height:50 ()
   in
 
   let mode =
@@ -240,14 +243,20 @@ and rep_fun e a =
 
 let regex_replace_window (text_area : GText.view) =
   let title = "Replace" in
-  let reg_window = GWindow.window ~width:400 ~height:200 ~title () in
+  let reg_window = GWindow.window ~width:400 ~height:300 ~title () in
   let container = GPack.vbox ~packing:reg_window#add () in
   ignore (reg_window#connect#destroy ~callback:reg_window#destroy);
+  let regex_label =
+    GMisc.label ~text:"Replace: " ~packing:container#pack ~height:20 ()
+  in
   let regex_entry =
-    GEdit.entry ~packing:container#add ~width:350 ~height:100 ()
+    GEdit.entry ~packing:container#add ~width:350 ~height:50 ()
+  in
+  let with_label =
+    GMisc.label ~text:"With: " ~packing:container#pack ~height:20 ()
   in
   let with_entry =
-    GEdit.entry ~packing:container#add ~width:350 ~height:100 ()
+    GEdit.entry ~packing:container#add ~width:350 ~height:50 ()
   in
 
   let reg_mode =
@@ -350,7 +359,7 @@ let main () =
      to only show up when needed *)
   let text_scroll =
     GBin.scrolled_window ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC
-      ~packing:container#add ()
+      ~packing:container#add ~border_width:5 ()
   in
 
   (* Main text widget *)
