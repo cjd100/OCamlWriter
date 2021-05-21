@@ -36,9 +36,21 @@ let win_title = "Text Editor GUI"
 (* Initial width and height of the main window*)
 let win_dim = (400, 400)
 
-(* [Insert_text text field] inserts the text in the string [text] into
-   the text field [field] *)
+(** [Insert_text text field] inserts the text in the string [text] into
+    the text field [field] *)
 let insert_text text field = field#buffer#set_text text
+
+(** [highlight_test f a b] highlights the text in text field [f] from
+    index [a] to index [b]*)
+let highlight_text (field : GText.view) (a : int) (b : int) =
+  field#buffer#select_range
+    (field#buffer#get_iter_at_char a)
+    (field#buffer#get_iter_at_char b)
+
+(** [set_cursor_pos field p] sets the position of the cursor in the text
+    field [field] to [p]*)
+let set_cursor_pos (field : GText.view) p =
+  field#buffer#place_cursor (field#buffer#get_iter_at_char p)
 
 let insert_label_text text label = label#set_text text
 
@@ -149,9 +161,19 @@ let cipher_window text_area text (encrypt : bool) =
       else decrypt_file text_entry#text text_area text password_input ());
   password_input#show
 
-(** Highlights the first instance of the regular expression [reg] in the
-    text box past the cursor location *)
-let regex_find text_area reg parent = failwith ""
+(** [regex_find field reg] Highlights the first instance of the regular
+    expression [reg] in the text box [field] past the cursor location *)
+let regex_find (text_area : GText.view) reg =
+  let text = text_area#buffer#get_text () in
+  let cursor_pos = text_area#buffer#cursor_position in
+  let first_ind = Regex.find_reg reg text cursor_pos in
+  let matched_length =
+    String.length text
+    - String.length (Regex.replace_reg_first reg "" text)
+  in
+  let end_pos = first_ind + matched_length in
+  if first_ind = -1 then set_cursor_pos text_area (String.length text)
+  else highlight_text text_area first_ind end_pos
 
 let regex_find_window text_area text (encrypt : bool) =
   let title = "Find" in
@@ -299,6 +321,9 @@ let main () =
   ignore
     (factory#add_item "Undo" ~key:_Z ~callback:(fun () ->
          undo editor_window text_field));
+  ignore
+    (factory#add_item "Find" ~key:_F ~callback:(fun () ->
+         regex_find text_field "Bru.*h"));
 
   (* Theme menu *)
   let factory = new GMenu.factory theme_menu ~accel_group in
