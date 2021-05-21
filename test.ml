@@ -79,9 +79,13 @@ let remove_dups_test name result lst =
   assert_equal result (Words.remove_dups lst) ~cmp:cmp_set_like_lists
     ~printer:(pp_list pp_string)
 
-let replace_test name reg rep str result exact =
+let replace_test name reg rep str result exact first =
   let replace =
-    if exact then Regex.replace_exact else Regex.replace_reg
+    match (exact, first) with
+    | true, true -> Regex.replace_exact_first
+    | true, false -> Regex.replace_exact
+    | false, true -> Regex.replace_reg_first
+    | false, false -> Regex.replace_reg
   in
   name >:: fun _ ->
   assert_equal result (replace reg rep str) ~printer:(fun a -> a)
@@ -251,20 +255,20 @@ let regex_tests =
       "Jeff went to the store, where Jeff purchased many Jeff"
       "[Redacted] went to the store, where [Redacted] purchased many \
        [Redacted]"
-      true;
+      true false;
     replace_test "Delete any string that is enclosed by lowercase a's"
       "[a].*?[a]" "" "a this will be deleted, a but not this!"
-      " but not this!" false;
+      " but not this!" false false;
     replace_test
       "Replaces the word secret with letters in between it with the \
        word secret"
       "s.*e.*c.*r.*e.*t" "secret" "This is the secret message"
-      "Thisecret message" false;
+      "Thisecret message" false false;
     replace_test "Replaces fizz with buzz, string does not contain fizz"
-      "fizz" "buzz" "just some string" "just some string" true;
+      "fizz" "buzz" "just some string" "just some string" true false;
     replace_test "Replaces fizz with buzz" "fizz" "buzz"
       "fizzbuzz fizzbuzz fizz the buzz"
-      "buzzbuzz buzzbuzz buzz the buzz" true;
+      "buzzbuzz buzzbuzz buzz the buzz" true false;
     find_test "Find the first occurence of Waldo" "Waldo"
       "Noah Emma Oliver Ava Elijah Waldo William Sophia James Amelia \
        Benjamin Isabella Lucas Mia Henry Evelyn Alexander Harper"
@@ -287,7 +291,7 @@ let regex_tests =
        with our legal team, dial 786-123-4567"
       "Call [Redacted] for a free autoquote today! For inquiries with \
        our legal team, dial [Redacted]"
-      false;
+      false false;
     find_test "Find the first instance of a phone number in a string"
       "<[0-9]>{3}-<[0-9]>{3}-<[0-9]>{4}"
       "Call 800-999-1234 for a free autoquote today! For inquiries \
@@ -301,6 +305,14 @@ let regex_tests =
       "Password verification regex: password is 8 characters long, and \
        only contains letters and numbers. Invalid password"
       "<[A-Za-z0-9]>{8}" "P&assw0rd" 0 ~-1 false;
+    replace_test
+      "Replace the first instance of a phone number with \"Nope!\""
+      "<[0-9]>{3}-<[0-9]>{3}-<[0-9]>{4}" "Nope!"
+      "Call 800-999-1234 for a free autoquote today! For inquiries \
+       with our legal team, dial 786-123-4567"
+      "Call Nope! for a free autoquote today! For inquiries with our \
+       legal team, dial 786-123-4567"
+      false true;
   ]
 
 let suite =

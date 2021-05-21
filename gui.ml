@@ -52,8 +52,8 @@ let insert_text text field = field#buffer#set_text text
     index [a] to index [b]*)
 let highlight_text (field : GText.view) (a : int) (b : int) =
   field#buffer#select_range
-    (field#buffer#get_iter_at_char a)
     (field#buffer#get_iter_at_char b)
+    (field#buffer#get_iter_at_char a)
 
 (** [set_cursor_pos field p] sets the position of the cursor in the text
     field [field] to [p]*)
@@ -170,38 +170,42 @@ let cipher_window text_area text (encrypt : bool) =
 
 (** [regex_find field reg] Highlights the first instance of the regular
     expression [reg] in the text box [field] past the cursor location *)
-let regex_find (text_area : GText.view) reg =
+let regex_find (text_area : GText.view) (reg : string) (exact : bool) =
+  let find = if exact then Regex.find_exact else Regex.find_reg in
+  let replace_first =
+    if exact then Regex.replace_exact_first else Regex.replace_reg_first
+  in
   let text = text_area#buffer#get_text () in
   let cursor_pos = text_area#buffer#cursor_position in
-  let first_ind = Regex.find_reg reg text cursor_pos in
+  let first_ind = find reg text cursor_pos in
+
   let matched_length =
-    String.length text
-    - String.length (Regex.replace_reg_first reg "" text)
+    String.length text - String.length (replace_first reg "" text)
   in
   let end_pos = first_ind + matched_length in
   if first_ind = -1 then set_cursor_pos text_area (String.length text)
   else highlight_text text_area first_ind end_pos
 
-let regex_find_window text_area text (encrypt : bool) =
+let regex_find_window (text_area : GText.view) =
   let title = "Find" in
-  let password_input =
-    GWindow.window ~width:400 ~height:200 ~title ()
-  in
-  let container = GPack.vbox ~packing:password_input#add () in
-  ignore
-    (password_input#connect#destroy ~callback:password_input#destroy);
+  let reg_window = GWindow.window ~width:400 ~height:200 ~title () in
+  let container = GPack.vbox ~packing:reg_window#add () in
+  ignore (reg_window#connect#destroy ~callback:reg_window#destroy);
   let text_entry =
     GEdit.entry ~packing:container#add ~width:350 ~height:100 ()
   in
 
+  let mode =
+    GButton.check_button ~label:"Search by regex" ~packing:container#add
+      ~active:false ()
+  in
+
   let confirm_button =
-    GButton.button ~stock:`APPLY ~packing:container#add ()
+    GButton.button ~stock:`FIND ~packing:container#add ()
   in
   confirm_button#connect#clicked ~callback:(fun () ->
-      if encrypt then
-        encrypt_file text_entry#text text_area text password_input ()
-      else decrypt_file text_entry#text text_area text password_input ());
-  password_input#show
+      regex_find text_area text_entry#text (not mode#active));
+  reg_window#show
 
 let save word_label name text_area text =
   word_count := Words.word_count text;
@@ -338,7 +342,7 @@ let main () =
          redo editor_window text_field (text_field#buffer#get_text ())));
   ignore
     (factory#add_item "Find" ~key:_F ~callback:(fun () ->
-         regex_find text_field "Bru.*h"));
+         regex_find_window text_field ()));
 
   (* Theme menu *)
   let factory = new GMenu.factory theme_menu ~accel_group in
