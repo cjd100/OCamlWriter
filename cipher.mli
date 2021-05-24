@@ -1,4 +1,4 @@
-(* This module implements file encryption/decryption *)
+(** Cipher is a module that implements file encryption/decryption *)
 
 (** [encrypt key plain_text] is the text of [plain_text] encrypted into
     some indistinguishable form using [key]. Transforms plain text into

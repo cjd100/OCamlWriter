@@ -1,7 +1,8 @@
-(** This module implements functions for customization of the text
-    editor, including background color, font, and text color *)
+(** Customize is a module that implements functions for customization of
+    the text editor, including background color, font, and text color *)
 
-(** Modifies the background color and the text color *)
+(** [preset_theme] modifies the background color [bg] and the text color
+    [text] for a text field [textarea] *)
 val preset_theme :
   < misc :
       < modify_base :
@@ -40,26 +41,28 @@ val preset_theme :
   ] ->
   unit
 
-(** Opens the color palette and outputs changes in color for
-    modification of the text area background *)
+(** [background_color_change] opens the color palette and outputs
+    changes in color for modification of the text field [textarea]
+    background *)
 val background_color_change :
   < misc :
       < modify_base : ([> `NORMAL ] * GDraw.color) list -> 'a ; .. >
   ; .. > ->
   unit
 
-(** Opens the color palette and outputs changes in color for
-    modification of the text area text *)
+(** [text_color_change] opens the color palette and outputs changes in
+    color for modification of the text field [textarea] text *)
 val text_color_change :
   < misc :
       < modify_text : ([> `NORMAL ] * GDraw.color) list -> 'a ; .. >
   ; .. > ->
   unit
 
-(** Opens the font selector and outputs changes in font for modification
-    of the text area text *)
+(** [font_change] opens the font selector and outputs changes in font
+    for modification of the text field [textarea] text *)
 val font_change :
   < misc : < modify_font_by_name : string -> 'a ; .. > ; .. > -> unit
 
-(** Retrieves settings previously applied before exiting the editor *)
+(** [from_json] retrieves settings previously applied before exiting the
+    editor from a json file [json] *)
 val from_json : Yojson.Basic.t -> string

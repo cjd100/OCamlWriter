@@ -1,10 +1,10 @@
-(* This module implements all file I/O, including writing, reading, and
-   creating files*)
+(** File is a module that implements all file I/O, including writing,
+    reading, and creating files *)
 
-(* abstract type that represents a file *)
+(** Abstract type that represents a file *)
 type f
 
-(* the type of filenames *)
+(** The type of filenames *)
 type filename = string
 
 (** [open_to_string filename] creates a strings that represents the
