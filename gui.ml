@@ -334,7 +334,13 @@ let load_settings textarea =
       textarea#misc#modify_font_by_name font
   | _ -> ()
 
-let write_html path data = Soup.write_file (path ^ ".html") data
+let write_html path data =
+  let modded_path =
+    match String.split_on_char '.' path with
+    | [] -> failwith "Violates precondition"
+    | h :: t -> h
+  in
+  Soup.write_file (modded_path ^ ".html") data
 
 let main () =
   let editor_window =
