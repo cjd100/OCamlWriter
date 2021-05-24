@@ -342,6 +342,8 @@ let write_html path data =
   in
   Soup.write_file (modded_path ^ ".html") data
 
+let format_html data = data |> parse |> pretty_print
+
 let main () =
   let editor_window =
     GWindow.window ~width:(fst win_dim) ~height:(snd win_dim)
@@ -361,6 +363,7 @@ let main () =
   let edit_menu = factory#add_submenu "Edit" in
   let theme_menu = factory#add_submenu "Themes" in
   let encryption_menu = factory#add_submenu "Encryption" in
+  let html_menu = factory#add_submenu "HTML" in
 
   (* word count label *)
 
@@ -407,9 +410,6 @@ let main () =
   ignore
     (factory#add_item "Open file" ~key:_O ~callback:(fun () ->
          load_file editor_window file_label word_label text_field));
-  ignore
-    (factory#add_item "Create HTML" ~key:_H ~callback:(fun () ->
-         write_html !curr_file (text_field#buffer#get_text ())));
   ignore (factory#add_item "Quit" ~key:_Q ~callback:Main.quit);
 
   (* Edit menu *)
@@ -458,6 +458,15 @@ let main () =
            (text_field#buffer#get_text ())
            false ()));
   print_endline (text_field#buffer#get_text ());
+
+  let factory = new GMenu.factory html_menu ~accel_group in
+  ignore
+    (factory#add_item "Create HTML" ~key:_H ~callback:(fun () ->
+         write_html !curr_file (text_field#buffer#get_text ())));
+  ignore
+    (factory#add_item "Format HTML" ~callback:(fun () ->
+         save word_label !curr_file text_field
+           (format_html (text_field#buffer#get_text ()))));
 
   (* Displays the main window and continues the main loop, this should
      always be the last part *)
