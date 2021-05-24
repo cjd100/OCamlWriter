@@ -5,11 +5,13 @@ let chaotic_funct n =
   let sn = (125. *. sin (1. /. den)) +. 125. in
   int_of_float sn
 
+(** [array_sum arr] is the sum of the elements of [arr], where [arr] is
+    an array containing integers. *)
 let array_sum arr = Array.fold_left (fun n acc -> n + acc) 0 arr
 
 (** [xor_enc k t] is [t] encrypted using key [k]. [k] is an array of
     integers and [t] is a list of integers, they do not need to be the
-    same size *)
+    same size. It must also hold that: (xor_enc k (xor_enc k t)) = t *)
 let xor_enc k t =
   let key_ascii_sum = array_sum k in
   let key_len = Array.length k in

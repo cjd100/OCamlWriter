@@ -68,18 +68,17 @@ let update_insert_counts text label =
   char_count := Words.char_count text;
   uniq_count := Words.uniq_count text;
   label#set_text
-    ( "Words: "
+    ("Words: "
     ^ string_of_int !word_count
     ^ " Characters: "
     ^ string_of_int !char_count
     ^ " Unique Words: "
-    ^ string_of_int !uniq_count )
+    ^ string_of_int !uniq_count)
 
 (* [new_file parent text_area] opens up a new window from the parent
    window [parent]. The new window is a file creation widget that
    creates an empty new file *)
 let new_file parent text_area =
-  (* window that appears when the request file command is issued*)
   let open_file_window =
     GWindow.dialog ~width:200 ~height:100 ~title:"Create new file"
       ~parent ()
@@ -99,13 +98,12 @@ let new_file parent text_area =
         ignore (File.create_file text)
     | `DELETE_EVENT -> ()
   end;
-  open_file_window#destroy
+  open_file_window#destroy ()
 
 (** [load_file parent] opens up a new window, with the parent window
     [parent]. The new window is a file selection GUI that loads the
     selected file into the document. *)
-let load_file parent file_label word_label text_area =
-  let get_filename = function Some f -> f | None -> "" in
+let rec load_file parent file_label word_label text_area =
   (* window that appears when the request file command is issued*)
   let open_file_window =
     GWindow.file_chooser_dialog ~action:`OPEN ~width:300 ~height:300
@@ -114,42 +112,44 @@ let load_file parent file_label word_label text_area =
   open_file_window#add_button_stock `CANCEL `CANCEL;
   open_file_window#add_button_stock `NEW `NEW;
   open_file_window#add_select_button_stock `OPEN `OPEN;
-  begin
-    match open_file_window#run () with
-    | `OPEN ->
-        let filename = get_filename open_file_window#filename in
-        (* get a string from the file and then out it in the text field *)
-        print_endline ("OPEN The file you selected was: " ^ filename);
-        curr_file := filename;
-        insert_label_text filename file_label;
-        update_insert_counts (File.open_to_string filename) word_label;
-        initialize_states;
-        (* Push initial text onto save stack *)
-        Stack.push (File.open_to_string filename) state;
-        ignore (insert_text (File.open_to_string filename) text_area)
-    | `NEW -> ignore (new_file open_file_window text_area)
-    (*why is it partial?*)
-    (* TODO: MAKE IT WORK SOMEHOW *)
-    | `DELETE_EVENT | `CANCEL -> ()
-  end;
+  run_win open_file_window file_label word_label text_area;
   open_file_window#destroy ()
+
+(** [run_win file_dia f_label w_label t_area] calls the run command on
+    the file chooser dialogue [file_dia] and pattern matches the output,
+    either opening a file, creating a new file, or exiting the window. *)
+and run_win file_dia f_label w_label t_area =
+  let get_filename = function Some f -> f | None -> "" in
+  match file_dia#run () with
+  | `OPEN ->
+      let filename = get_filename file_dia#filename in
+      (* get a string from the file and then out it in the text field *)
+      print_endline ("OPEN The file you selected was: " ^ filename);
+      curr_file := filename;
+      insert_label_text filename f_label;
+      update_insert_counts (File.open_to_string filename) w_label;
+      initialize_states;
+      (* Push initial text onto save stack *)
+      Stack.push (File.open_to_string filename) state;
+      ignore (insert_text (File.open_to_string filename) t_area)
+  | `NEW -> ignore (new_file file_dia t_area)
+  | `DELETE_EVENT | `CANCEL -> ()
 
 (** [encrypt_file pass text_area text parent] encrypts the [text] using
     password [pass], closing the window [parent] at the end *)
 let encrypt_file pass text_area text parent =
   insert_text (Cipher.encrypt pass text) text_area;
-  parent#destroy
+  parent#destroy ()
 
 (** [decrypt_file pass text_area text parent] encrypts [text] using
     password [pass], then puts closing the window [parent] at the end *)
 let decrypt_file pass text_area text parent =
   insert_text (Cipher.decrypt pass text) text_area;
-  parent#destroy
+  parent#destroy ()
 
 let cipher_window text_area text (encrypt : bool) =
   let title =
-    if encrypt then "Encryption: Input password"
-    else "Decryption: Input password"
+    (if encrypt then "En" else "De") ^ "cryption: Input password"
   in
   let password_input =
     GWindow.window ~width:400 ~height:200 ~title ()
@@ -163,10 +163,10 @@ let cipher_window text_area text (encrypt : bool) =
   let confirm_button =
     GButton.button ~stock:`APPLY ~packing:container#add ()
   in
-  confirm_button#connect#clicked ~callback:(fun () ->
-      if encrypt then
-        encrypt_file text_entry#text text_area text password_input ()
-      else decrypt_file text_entry#text text_area text password_input ());
+  ignore
+    (confirm_button#connect#clicked ~callback:(fun () ->
+         (if encrypt then encrypt_file else decrypt_file)
+           text_entry#text text_area text password_input));
   password_input#show
 
 let matched_length text reg exact =
@@ -196,7 +196,7 @@ let regex_find_window (text_area : GText.view) =
   let reg_window = GWindow.window ~width:400 ~height:200 ~title () in
   let container = GPack.vbox ~packing:reg_window#add () in
   ignore (reg_window#connect#destroy ~callback:reg_window#destroy);
-  let find_label =
+  let _ =
     GMisc.label ~text:"Find: " ~packing:container#pack ~height:20 ()
   in
   let text_entry =
@@ -210,8 +210,9 @@ let regex_find_window (text_area : GText.view) =
   let confirm_button =
     GButton.button ~stock:`FIND ~packing:container#add ()
   in
-  confirm_button#connect#clicked ~callback:(fun () ->
-      regex_find text_area text_entry#text (not mode#active));
+  ignore
+    (confirm_button#connect#clicked ~callback:(fun () ->
+         regex_find text_area text_entry#text (not mode#active)));
   reg_window#show
 
 (** [regex_replace area reg new_s exact all] is the same string
@@ -247,13 +248,13 @@ let regex_replace_window (text_area : GText.view) =
   let reg_window = GWindow.window ~width:400 ~height:300 ~title () in
   let container = GPack.vbox ~packing:reg_window#add () in
   ignore (reg_window#connect#destroy ~callback:reg_window#destroy);
-  let regex_label =
+  let _ =
     GMisc.label ~text:"Replace: " ~packing:container#pack ~height:20 ()
   in
   let regex_entry =
     GEdit.entry ~packing:container#add ~width:350 ~height:50 ()
   in
-  let with_label =
+  let _ =
     GMisc.label ~text:"With: " ~packing:container#pack ~height:20 ()
   in
   let with_entry =
@@ -271,9 +272,10 @@ let regex_replace_window (text_area : GText.view) =
   let confirm_button =
     GButton.button ~stock:`FIND_AND_REPLACE ~packing:container#add ()
   in
-  confirm_button#connect#clicked ~callback:(fun () ->
-      regex_replace text_area regex_entry#text with_entry#text
-        (not reg_mode#active) all_mode#active);
+  ignore
+    (confirm_button#connect#clicked ~callback:(fun () ->
+         regex_replace text_area regex_entry#text with_entry#text
+           (not reg_mode#active) all_mode#active));
   reg_window#show
 
 let save word_label name text_area text =
@@ -311,11 +313,11 @@ let rgbtuple_of_string str =
   let values = String.split_on_char ' ' str in
   match values with
   | h :: i :: j :: t ->
-      ( `RGB
-          ( int_of_string (String.trim h),
-            int_of_string (String.trim i),
-            int_of_string (String.trim j) )
-        : GDraw.color )
+      (`RGB
+         ( int_of_string (String.trim h),
+           int_of_string (String.trim i),
+           int_of_string (String.trim j) )
+        : GDraw.color)
   | _ -> `WHITE
 
 let load_settings textarea =
