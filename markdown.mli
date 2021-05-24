@@ -7,3 +7,7 @@ val write_html : string -> string -> unit
 
 (** [format_html] formats html text [data] into a more readable form *)
 val format_html : string -> string
+
+(** [to_html] formats text [data] into syntax that can be interpreted by
+    a .html file, for the allowance of shortcut [symbol] by the user *)
+val to_html : char -> string -> string

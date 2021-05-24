@@ -9,3 +9,27 @@ let write_html path data =
   Soup.write_file (modded_path ^ ".html") data
 
 let format_html data = data |> parse |> pretty_print
+
+let rec to_html_helper symbol datalist =
+  match (symbol, datalist) with
+  | '*', [] -> ""
+  | '*', [ data ] -> data
+  | '*', [ ""; data ] -> "*" ^ data
+  | '*', [ data; "" ] -> data ^ "*"
+  | '*', [ ""; data; "" ] -> "<b>" ^ data ^ "</b>"
+  | '*', [ text; text2 ] -> text ^ "*" ^ text2
+  | '*', h1 :: h2 :: t ->
+      h1 ^ "<b>" ^ h2 ^ "</b>" ^ to_html_helper symbol t
+  | '_', [] -> ""
+  | '_', [ data ] -> data
+  | '_', [ ""; data ] -> "_" ^ data
+  | '_', [ data; "" ] -> data ^ "_"
+  | '_', [ ""; data; "" ] -> "<i>" ^ data ^ "</i>"
+  | '_', [ text; text2 ] -> text ^ "_" ^ text2
+  | '_', h1 :: h2 :: t ->
+      h1 ^ "<i>" ^ h2 ^ "</i>" ^ to_html_helper symbol t
+  | _ -> failwith "Violates precondition"
+
+let to_html symbol data =
+  let split = String.split_on_char symbol data in
+  to_html_helper symbol split

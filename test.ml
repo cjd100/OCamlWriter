@@ -30,6 +30,7 @@ open Cipher
 open Yojson
 open Words
 open Regex
+open Markdown
 
 let pp_string s = "\"" ^ s ^ "\""
 
@@ -115,6 +116,10 @@ let find_test name reg str ind result exact =
   let find = if exact then Regex.find_exact else Regex.find_reg in
   name >:: fun _ ->
   assert_equal result (find reg str ind) ~printer:string_of_int
+
+let to_html_test name sym str result =
+  name >:: fun _ ->
+  assert_equal result (Markdown.to_html sym str) ~printer:(fun a -> a)
 
 let cipher_tests =
   [
@@ -353,11 +358,64 @@ let regex_tests =
       false true;
   ]
 
+let markdown_tests =
+  [
+    to_html_test "String containing no asterisks" '*' "hello" "hello";
+    to_html_test "String containing only one asterisk" '*' "*hello"
+      "*hello";
+    to_html_test "String containing two asterisks" '*' "*hello*"
+      "<b>hello</b>";
+    to_html_test
+      "String containing two asterisks with words on left side" '*'
+      "I want to say *hello*" "I want to say <b>hello</b>";
+    to_html_test
+      "String containing two asterisks with words on right side" '*'
+      "*Hello* is what I said" "<b>Hello</b> is what I said";
+    to_html_test
+      "String containing two asterisks with words on both sides" '*'
+      "I want to say *hello* to him" "I want to say <b>hello</b> to him";
+    to_html_test "String containing three asterisks" '*'
+      "I want to say *hello* to him but he does not *like me"
+      "I want to say <b>hello</b> to him but he does not *like me";
+    to_html_test "String containing four asterisks" '*'
+      "I want to say *hello* to him but he does not *like* me"
+      "I want to say <b>hello</b> to him but he does not <b>like</b> me";
+    to_html_test "String containing no underscores" '_' "hello" "hello";
+    to_html_test "String containing only one underscore" '_' "_hello"
+      "_hello";
+    to_html_test "String containing two underscores" '_' "_hello_"
+      "<i>hello</i>";
+    to_html_test
+      "String containing two underscores with words on left side" '_'
+      "I want to say _hello_" "I want to say <i>hello</i>";
+    to_html_test
+      "String containing two underscores with words on right side" '_'
+      "_Hello_ is what I said" "<i>Hello</i> is what I said";
+    to_html_test
+      "String containing two underscores with words on both sides" '_'
+      "I want to say _hello_ to him" "I want to say <i>hello</i> to him";
+    to_html_test "String containing three underscores" '_'
+      "I want to say _hello_ to him but he does not _like me"
+      "I want to say <i>hello</i> to him but he does not _like me";
+    to_html_test "String containing four underscores" '_'
+      "I want to say _hello_ to him but he does not _like_ me"
+      "I want to say <i>hello</i> to him but he does not <i>like</i> me";
+    to_html_test "String containing four underscores and two asterisks"
+      '_' "I want to say _hello_ to him but *he* does not _like_ me"
+      "I want to say <i>hello</i> to him but *he* does not <i>like</i> \
+       me";
+  ]
+
 let suite =
   "test suite for MS1"
   >::: List.flatten
          [
-           file_tests; gui_tests; cipher_tests; word_tests; regex_tests;
+           file_tests;
+           gui_tests;
+           cipher_tests;
+           word_tests;
+           regex_tests;
+           markdown_tests;
          ]
 
 let _ =
