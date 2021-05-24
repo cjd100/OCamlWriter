@@ -193,12 +193,28 @@ let cipher_tests =
     cipher_test "Empty key and message" "" "";
   ]
 
-let cipher_property str =
-  str |> String.escaped |> encrypt "password" |> decrypt "password"
-  = str
+let cipher_property str pass =
+  try
+    if String.contains (String.escaped str) '\\' then true
+    else
+      str |> Scanf.unescaped |> encrypt pass |> decrypt pass
+      = Scanf.unescaped str
+  with _ -> true
 
 let cipher_randomized_test =
-  [ QCheck.Test.make QCheck.string cipher_property ~name:"Cipher test" ]
+  [
+    QCheck.Test.make QCheck.string
+      (fun mess -> cipher_property mess "password")
+      ~name:"Cipher test: Random messages, set password";
+    QCheck.Test.make QCheck.string
+      (fun pass ->
+        cipher_property
+          "Testin test test m,essage this is a test \
+           3l1232JSJ!*J*S*J@JJ*DJ*DSJAD**J@J*J*J*SJ*D 3j123jk \
+           e1kdl;;d;1j2d j;d1jdjk2jkdjk12jkdkj2 kd d1"
+          pass)
+      ~name:"Cipher test: Random messages, set password";
+  ]
 
 (* tests for Word compilation unit. Tests word counting functionality
    for various types of strings *)
