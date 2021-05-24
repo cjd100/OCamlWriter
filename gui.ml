@@ -541,6 +541,9 @@ let main () =
   ignore
     (factory#add_item "Regex Help" ~callback:(fun () ->
          message_window_from_file "data/help/regex.txt"));
+  ignore
+    (factory#add_item "HTML Help" ~callback:(fun () ->
+         message_window_from_file "data/help/html.txt"));
 
   (* Displays the main window and continues the main loop, this should
      always be the last part *)

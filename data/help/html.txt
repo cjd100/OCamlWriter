@@ -1,0 +1,19 @@
+HTML help
+
+HTML help:
+
+When writing in HTML, use the standard tags. By clicking on the format HTML 
+button in the HTML dropdown menu, the tags will be organized into a more
+readable format. By clicking on the write HTML button, a .html file in your
+directory will be created that can be interpreted.
+
+Shortcuts have been provided for italics and bold
+
+  Use * to denote bold text (Ex: *hello*)
+
+  Use _ to denote italics (Ex: _hello_)
+
+By clicking format HTML, these shortcuts will be automatically converted to the
+tags <b> and <i> respectively. One can also write HTML without formatting first,
+and the shortcuts will be converted accordingly, but not modified in the actual
+text file.
