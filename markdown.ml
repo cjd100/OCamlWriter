@@ -28,6 +28,14 @@ let rec to_html_helper symbol datalist =
   | '_', [ text; text2 ] -> text ^ "_" ^ text2
   | '_', h1 :: h2 :: t ->
       h1 ^ "<i>" ^ h2 ^ "</i>" ^ to_html_helper symbol t
+  | '\n', [] -> ""
+  | '\n', [ data ] -> data
+  | '\n', [ ""; data ] -> "<br>" ^ data
+  | '\n', [ data; "" ] -> data ^ "<br>"
+  | '\n', [ ""; data; "" ] -> "<br>" ^ data ^ "<br>"
+  | '\n', [ text; text2 ] -> text ^ "<br>" ^ text2
+  | '\n', h1 :: h2 :: t ->
+      h1 ^ "<br>" ^ h2 ^ "<br>" ^ to_html_helper symbol t
   | _ -> failwith "Violates precondition"
 
 let to_html symbol data =
