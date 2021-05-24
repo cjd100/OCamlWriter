@@ -7,5 +7,8 @@
 
   ********************************************)
 
+(** Author is a module that tracks the number of hours the developer
+    team has worked in total *)
+
 (** [hours_worked] is the number of hours the group worked in total. *)
 val hours_worked : int

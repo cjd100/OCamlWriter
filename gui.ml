@@ -517,6 +517,7 @@ let main () =
            false ()));
   print_endline (text_field#buffer#get_text ());
 
+  (* HTML menu *)
   let factory = new GMenu.factory html_menu ~accel_group in
   ignore
     (factory#add_item "Create HTML" ~key:_H ~callback:(fun () ->

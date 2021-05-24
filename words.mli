@@ -1,3 +1,6 @@
+(** Words is a module that contains functions for keeping track of the
+    amount of words and characters within strings *)
+
 (** [word_count s] takes in a string s and produces an int that
     signifies the number of distinct words (defined as a collection of
     alphanumeric characters delimited by whitespace) given in the string
