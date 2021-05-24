@@ -13,6 +13,7 @@ opam install ounit2
 opam install lablgtk
 opam install core
 opam install yojson
+opam install lambdasoup
 
 When using WSL on Windows:
 Install Xming X Server for Windows
