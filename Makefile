@@ -1,4 +1,4 @@
-MODULES=gui file author customize words state cipher markdown regex
+MODULES=gui file author customize words state cipher markdown
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
