@@ -526,10 +526,11 @@ let main () =
            |> Markdown.to_html '_' |> Markdown.to_html '*' )));
   ignore
     (factory#add_item "Format HTML" ~callback:(fun () ->
-         File.save_to_file !curr_file
+         insert_text
            (Markdown.format_html
               ( text_field#buffer#get_text ()
-              |> Markdown.to_html '_' |> Markdown.to_html '*' ))));
+              |> Markdown.to_html '_' |> Markdown.to_html '*' ))
+           text_field));
 
   let factory = new GMenu.factory help_menu ~accel_group in
   ignore
