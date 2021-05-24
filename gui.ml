@@ -523,15 +523,15 @@ let main () =
     (factory#add_item "Create HTML" ~key:_H ~callback:(fun () ->
          Markdown.write_html !curr_file
            ( text_field#buffer#get_text ()
-           |> Markdown.to_html '_' |> Markdown.to_html '*'
-           |> Markdown.to_html '\n' )));
+           |> Markdown.to_html '\n' |> Markdown.to_html '_'
+           |> Markdown.to_html '*' )));
   ignore
     (factory#add_item "Format HTML" ~callback:(fun () ->
          insert_text
            (Markdown.format_html
               ( text_field#buffer#get_text ()
-              |> Markdown.to_html '_' |> Markdown.to_html '*'
-              |> Markdown.to_html '\n' ))
+              |> Markdown.to_html '\n' |> Markdown.to_html '_'
+              |> Markdown.to_html '*' ))
            text_field));
 
   let factory = new GMenu.factory help_menu ~accel_group in
