@@ -1,3 +1,28 @@
+(* Testing approach: Our testing approach involves a combination of
+   different methodologies. First off we used test-driven development;
+   often when we first created a module, we would make the .mli file and
+   document some key functions then before writing the implementation we
+   would write test cases. By doing this, we were able to gauge our
+   progress in writing a function since we would see how many cases it
+   passed. Once we have part of the function written, we then do further
+   testing on it by coming up with any edge cases or other examples that
+   have not yet been tested. For the Cipher module, we also used QCheck
+   randomized testing since a cipher should have the property that the
+   encrypt and decrypt functions are inverses of each other (given the
+   same password). The QCheck testing was especially important for the
+   Cipher module since we want to ensure that a user does not corrupt
+   their data when they encrypt it. As we continue with testing any test
+   case that us or QCheck finds to fail is permanently added to the
+   testing suite, this ensures that changing the code will not cause any
+   old bugs to reappear. That summarizes the testing done inside of
+   test.ml, however these forms of testing are limited in the sense that
+   they can only test the underlying functions that are used in the GUI.
+   To fully test our system, we also use manual testing. We often launch
+   the text editor interface and try using its different features,
+   making sure that newly implemented features work as expected, and
+   that we have not broken any previously tested features. When
+   possible, we try to write a test case that replicates any issues we
+   find during manual testing. *)
 open OUnit2
 open QCheck
 open File
@@ -193,6 +218,9 @@ let cipher_tests =
     cipher_test "Empty key and message" "" "";
   ]
 
+(* [cipher_property str pass] is the property that a cipher must hold
+   true for. Any message that is encrypted and then decrypted with the
+   same password should yield the same message. *)
 let cipher_property str pass =
   try
     if String.contains (String.escaped str) '\\' then true
@@ -201,6 +229,7 @@ let cipher_property str pass =
       = Scanf.unescaped str
   with _ -> true
 
+(* Randomized QCheck tests for encryption. *)
 let cipher_randomized_test =
   [
     QCheck.Test.make QCheck.string
@@ -213,7 +242,7 @@ let cipher_randomized_test =
            3l1232JSJ!*J*S*J@JJ*DJ*DSJAD**J@J*J*J*SJ*D 3j123jk \
            e1kdl;;d;1j2d j;d1jdjk2jkdjk12jkdkj2 kd d1"
           pass)
-      ~name:"Cipher test: Random messages, set password";
+      ~name:"Cipher test: Random messages, set message";
   ]
 
 (* tests for Word compilation unit. Tests word counting functionality
