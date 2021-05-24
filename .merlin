@@ -6,3 +6,4 @@ PKG ounit2
 PKG core
 PKG stack
 PKG qcheck
+PKG lambdasoup
