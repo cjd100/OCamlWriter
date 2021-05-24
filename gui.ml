@@ -5,6 +5,7 @@ open Customize
 open State
 open Stack
 open Regex
+open Soup
 
 let curr_file = ref ""
 
@@ -67,12 +68,12 @@ let update_insert_counts text label =
   char_count := Words.char_count text;
   uniq_count := Words.uniq_count text;
   label#set_text
-    ("Words: "
+    ( "Words: "
     ^ string_of_int !word_count
     ^ " Characters: "
     ^ string_of_int !char_count
     ^ " Unique Words: "
-    ^ string_of_int !uniq_count)
+    ^ string_of_int !uniq_count )
 
 (* [new_file parent text_area] opens up a new window from the parent
    window [parent]. The new window is a file creation widget that
@@ -310,11 +311,11 @@ let rgbtuple_of_string str =
   let values = String.split_on_char ' ' str in
   match values with
   | h :: i :: j :: t ->
-      (`RGB
-         ( int_of_string (String.trim h),
-           int_of_string (String.trim i),
-           int_of_string (String.trim j) )
-        : GDraw.color)
+      ( `RGB
+          ( int_of_string (String.trim h),
+            int_of_string (String.trim i),
+            int_of_string (String.trim j) )
+        : GDraw.color )
   | _ -> `WHITE
 
 let load_settings textarea =
@@ -332,6 +333,8 @@ let load_settings textarea =
       textarea#misc#modify_text [ (`NORMAL, text) ];
       textarea#misc#modify_font_by_name font
   | _ -> ()
+
+let write_html path data = Soup.write_file (path ^ ".html") data
 
 let main () =
   let editor_window =
@@ -398,6 +401,9 @@ let main () =
   ignore
     (factory#add_item "Open file" ~key:_O ~callback:(fun () ->
          load_file editor_window file_label word_label text_field));
+  ignore
+    (factory#add_item "Create HTML" ~key:_H ~callback:(fun () ->
+         write_html !curr_file (text_field#buffer#get_text ())));
   ignore (factory#add_item "Quit" ~key:_Q ~callback:Main.quit);
 
   (* Edit menu *)
