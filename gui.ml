@@ -5,7 +5,7 @@ open Customize
 open State
 open Stack
 open Regex
-open Soup
+open Markdown
 
 let curr_file = ref ""
 
@@ -334,16 +334,6 @@ let load_settings textarea =
       textarea#misc#modify_font_by_name font
   | _ -> ()
 
-let write_html path data =
-  let modded_path =
-    match String.split_on_char '.' path with
-    | [] -> failwith "Violates precondition"
-    | h :: t -> h
-  in
-  Soup.write_file (modded_path ^ ".html") data
-
-let format_html data = data |> parse |> pretty_print
-
 let main () =
   let editor_window =
     GWindow.window ~width:(fst win_dim) ~height:(snd win_dim)
@@ -462,11 +452,11 @@ let main () =
   let factory = new GMenu.factory html_menu ~accel_group in
   ignore
     (factory#add_item "Create HTML" ~key:_H ~callback:(fun () ->
-         write_html !curr_file (text_field#buffer#get_text ())));
+         Markdown.write_html !curr_file (text_field#buffer#get_text ())));
   ignore
     (factory#add_item "Format HTML" ~callback:(fun () ->
-         save word_label !curr_file text_field
-           (format_html (text_field#buffer#get_text ()))));
+         File.save_to_file !curr_file
+           (Markdown.format_html (text_field#buffer#get_text ()))));
 
   (* Displays the main window and continues the main loop, this should
      always be the last part *)
