@@ -1,0 +1,15 @@
+Encryption Help
+
+Encryption Help:
+
+To encrypt the currently opened file, select Encryption from the Encryption menu
+and input a password.
+
+To decrypt the currently opened file, select Decryption from the Encryption menu 
+and input the same password that you used when encrypting the file.
+
+Passwords must be 6 or more characters long.
+
+Make sure to save changes after encrypting or decrypting a file.
+
+Do not modify an encrypted file, or you may be unable to decrypt it afterwards.

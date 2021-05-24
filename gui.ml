@@ -45,6 +45,59 @@ let win_title = "Text Editor GUI"
 (* Initial width and height of the main window*)
 let win_dim = (400, 400)
 
+let message_window title message =
+  let message_win = GWindow.window ~title ~show:true () in
+  let container =
+    GPack.vbox ~packing:message_win#add ~border_width:10 ()
+  in
+  ignore (message_win#connect#destroy ~callback:message_win#destroy);
+  let _ = GMisc.label ~text:message ~packing:container#pack () in
+  let close_button =
+    GButton.button ~stock:`CLOSE ~packing:container#add ()
+  in
+  ignore
+    (close_button#connect#clicked ~callback:(fun () ->
+         message_win#destroy ()))
+
+(** [message_window_from_file f] reads from file [f] and creates a new
+    window, where file [f] has the title on the first line, and the
+    message on subsequent lines. Raise: Failure "Invalid message file"
+    if the message file inputted by the user is invalid. *)
+let message_window_from_file f =
+  let contents = File.open_to_string f in
+  let content_split = String.split_on_char '\n' contents in
+  match content_split with
+  | h :: t ->
+      let merged_tail =
+        List.fold_left (fun s acc -> acc ^ "\n" ^ s) "" (List.rev t)
+      in
+      message_window h merged_tail
+  | [] -> failwith "Invalid message file"
+
+(** [message_window_from_file_rep f rep] is the same as
+    [message_window_from_file f], except it also accepts a list of
+    strings [rep] so that the nth element of [rep] replaces the string
+    "(n)" in the message content. *)
+let rec message_window_from_file_rep f rep =
+  let contents = File.open_to_string f in
+  let content_split = String.split_on_char '\n' contents in
+  match content_split with
+  | h :: t ->
+      let merged_tail =
+        List.fold_left (fun s acc -> acc ^ "\n" ^ s) "" (List.rev t)
+      in
+      message_window h (list_replace 0 rep merged_tail)
+  | [] -> failwith "Invalid message file"
+
+and list_replace ind r str =
+  match r with
+  | [] -> str
+  | h :: t ->
+      let new_str =
+        Regex.replace_exact ("(" ^ string_of_int ind ^ ")") h str
+      in
+      list_replace (ind + 1) t new_str
+
 (** [Insert_text text field] inserts the text in the string [text] into
     the text field [field] *)
 let insert_text text field = field#buffer#set_text text
@@ -61,6 +114,8 @@ let highlight_text (field : GText.view) (a : int) (b : int) =
 let set_cursor_pos (field : GText.view) p =
   field#buffer#place_cursor (field#buffer#get_iter_at_char p)
 
+(** [insert_label_text text label] updatest the text contained in
+    [label] to [text]*)
 let insert_label_text text label = label#set_text text
 
 let update_insert_counts text label =
@@ -138,14 +193,21 @@ and run_win file_dia f_label w_label t_area =
 (** [encrypt_file pass text_area text parent] encrypts the [text] using
     password [pass], closing the window [parent] at the end *)
 let encrypt_file pass text_area text parent =
-  insert_text (Cipher.encrypt pass text) text_area;
+  if String.length pass < 6 then
+    message_window_from_file
+      "data/message dialogues/password_length_error.txt"
+  else insert_text (Cipher.encrypt pass text) text_area;
   parent#destroy ()
 
 (** [decrypt_file pass text_area text parent] encrypts [text] using
     password [pass], then puts closing the window [parent] at the end *)
 let decrypt_file pass text_area text parent =
-  insert_text (Cipher.decrypt pass text) text_area;
-  parent#destroy ()
+  try
+    insert_text (Cipher.decrypt pass text) text_area;
+    parent#destroy ()
+  with _ ->
+    message_window_from_file
+      "data/message dialogues/password_incorrect.txt"
 
 let cipher_window text_area text (encrypt : bool) =
   let title =
@@ -188,7 +250,10 @@ let regex_find (text_area : GText.view) (reg : string) (exact : bool) =
 
   let matched_len = matched_length text reg exact in
   let end_pos = first_ind + matched_len in
-  if first_ind = -1 then set_cursor_pos text_area (String.length text)
+  if first_ind = -1 then (
+    set_cursor_pos text_area (String.length text);
+    message_window_from_file_rep
+      "data/message dialogues/regex_not_found.txt" [ reg ])
   else highlight_text text_area first_ind end_pos
 
 let regex_find_window (text_area : GText.view) =
@@ -356,6 +421,7 @@ let main () =
   let theme_menu = factory#add_submenu "Themes" in
   let encryption_menu = factory#add_submenu "Encryption" in
   let html_menu = factory#add_submenu "HTML" in
+  let help_menu = factory#add_submenu "Help" in
 
   (* word count label *)
 
@@ -459,6 +525,14 @@ let main () =
     (factory#add_item "Format HTML" ~callback:(fun () ->
          File.save_to_file !curr_file
            (Markdown.format_html (text_field#buffer#get_text ()))));
+
+  let factory = new GMenu.factory help_menu ~accel_group in
+  ignore
+    (factory#add_item "Encryption Help" ~callback:(fun () ->
+         message_window_from_file "data/help/encryption.txt"));
+  ignore
+    (factory#add_item "Regex Help" ~callback:(fun () ->
+         message_window_from_file "data/help/regex.txt"));
 
   (* Displays the main window and continues the main loop, this should
      always be the last part *)

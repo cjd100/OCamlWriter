@@ -1,0 +1,36 @@
+Regular Expression Help
+
+Regular Expressions:
+
+The Find and Replace functionality under the Edit menu both allow the option to 
+search/replace by regular expressions.
+
+Below is a guide of regular expression features that can be used:
+
+.      Matches any character except newline.
+
+*      (postfix) Matches the preceding expression zero, one or several times
+
++      (postfix) Matches the preceding expression one or several times
+
+?      (postfix) Matches the preceding expression once or not at all
+
+[..]   Character set. Ranges are denoted with -, as in [a-z]. An initial ^, as in
+       [^0-9], complements the set. To include a ] character in a set, make it the first character of the set.
+       To include a - character in a set, make it the first or the last character of the set.
+
+^      Matches at beginning of line: either at the beginning of the matched string, or just after a '\n' character.
+
+$      Matches at end of line: either at the end of the matched string, or just before a '\n' character.
+
+\|     (infix) Alternative between two expressions.
+
+\(..\) Grouping and naming of the enclosed expression.
+
+\1     The text matched by the first \(...\) expression (\2 for the second expression, and so on up to \9).
+
+\b     Matches word boundaries.
+
+\      Quotes special characters. The special characters are $^\.*+?[].
+
+<A>{B} Matches the text matched by A, repeated exactly B times.
