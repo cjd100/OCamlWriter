@@ -1,3 +1,5 @@
+(** [chaotic_funct n] is a number calculated from [n] that differs
+    greatly when [n] changes. *)
 let chaotic_funct n =
   let den = float_of_int (n mod 255) /. (255. *. 10.) in
   let sn = (125. *. sin (1. /. den)) +. 125. in
