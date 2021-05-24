@@ -10,4 +10,4 @@ val encrypt : string -> string -> string
     text. *)
 val decrypt : string -> string -> string
 
-val block_list : string -> bool -> string list
+(*val block_list : string -> bool -> string list*)

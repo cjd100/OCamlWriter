@@ -5,3 +5,4 @@ PKG yojson
 PKG ounit2
 PKG core
 PKG stack
+PKG qcheck

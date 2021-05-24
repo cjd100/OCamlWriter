@@ -1,1 +1,1 @@
-true: package(ounit2),package(core),package(lablgtk2),package(yojson)
+true: package(ounit2),package(core),package(lablgtk2),package(yojson),package(qcheck)
