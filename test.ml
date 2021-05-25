@@ -400,26 +400,32 @@ let markdown_tests =
        me";
     to_html_test "String containing no line breaks" '\n' "hello" "hello";
     to_html_test "String containing only one line break" '\n' "\nhello"
-      "<br>hello";
+      "<br>\nhello";
     to_html_test "String containing two line breaks" '\n' "\nhello\n"
-      "<br>hello<br>";
+      "<br>\nhello<br>\n";
     to_html_test
       "String containing two line breaks with words on left side" '\n'
-      "I want to say \nhello\n" "I want to say <br>hello<br>";
+      "I want to say \nhello\n" "I want to say <br>\nhello<br>\n";
     to_html_test
       "String containing two line breaks with words on right side" '\n'
-      "\nHello\n is what I said" "<br>Hello<br> is what I said";
+      "\nHello\n is what I said" "<br>\nHello<br>\n is what I said";
     to_html_test
       "String containing two line breaks with words on both sides" '\n'
       "I want to say \nhello\n to him"
-      "I want to say <br>hello<br> to him";
+      "I want to say <br>\nhello<br>\n to him";
     to_html_test "String containing three line breaks" '\n'
       "I want to say \nhello\n to him but he does not \nlike me"
-      "I want to say <br>hello<br> to him but he does not <br>like me";
+      "I want to say <br>\n\
+       hello<br>\n\
+      \ to him but he does not <br>\n\
+       like me";
     to_html_test "String containing four underscores" '\n'
       "I want to say \nhello\n to him but he does not \nlike\n me"
-      "I want to say <br>hello<br> to him but he does not <br>like<br> \
-       me";
+      "I want to say <br>\n\
+       hello<br>\n\
+      \ to him but he does not <br>\n\
+       like<br>\n\
+      \ me";
   ]
 
 let suite =
