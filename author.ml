@@ -1,6 +1,6 @@
 let hw_n = 15
 
-let hw_c = 7
+let hw_c = 37
 
 let hw_b = 22
 
