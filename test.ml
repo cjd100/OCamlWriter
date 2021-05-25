@@ -404,6 +404,28 @@ let markdown_tests =
       '_' "I want to say _hello_ to him but *he* does not _like_ me"
       "I want to say <i>hello</i> to him but *he* does not <i>like</i> \
        me";
+    to_html_test "String containing no line breaks" '\n' "hello" "hello";
+    to_html_test "String containing only one line break" '\n' "\nhello"
+      "<br>hello";
+    to_html_test "String containing two line breaks" '\n' "\nhello\n"
+      "<br>hello<br>";
+    to_html_test
+      "String containing two line breaks with words on left side" '\n'
+      "I want to say \nhello\n" "I want to say <br>hello<br>";
+    to_html_test
+      "String containing two line breaks with words on right side" '\n'
+      "\nHello\n is what I said" "<br>Hello<br> is what I said";
+    to_html_test
+      "String containing two line breaks with words on both sides" '\n'
+      "I want to say \nhello\n to him"
+      "I want to say <br>hello<br> to him";
+    to_html_test "String containing three line breaks" '\n'
+      "I want to say \nhello\n to him but he does not \nlike me"
+      "I want to say <br>hello<br> to him but he does not <br>like me";
+    to_html_test "String containing four underscores" '\n'
+      "I want to say \nhello\n to him but he does not \nlike\n me"
+      "I want to say <br>hello<br> to him but he does not <br>like<br> \
+       me";
   ]
 
 let suite =
