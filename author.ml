@@ -1,4 +1,4 @@
-let hw_n = 15
+let hw_n = 25
 
 let hw_c = 37
 
