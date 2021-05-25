@@ -34,3 +34,11 @@ $      Matches at end of line: either at the end of the matched string, or just 
 \      Quotes special characters. The special characters are $^\.*+?[].
 
 <A>{B} Matches the text matched by A, repeated exactly B times.
+
+\d     Matches any digit character, equivalent to [0-9]
+
+\D     Matches any non-digit character, equivalent to [^0-9]
+
+\w     Matches any alphabet character, equivalent to [A-Za-z]
+
+\W     Matches any non-alphabet character, equivalent to [^A-Za-z]

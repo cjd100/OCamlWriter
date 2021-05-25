@@ -1,15 +1,36 @@
 open Str
 
 (** Introduces additional regex constructs that are not included in
-    OCaml's Str module by default. New constructs: <A>{I} will match the
-    string A, repeated I times. *)
+    OCaml's Str module by default. New constructs:
+
+    <A>{I} will match the string A, repeated I times.
+
+    \d Matches any digit character, equivalent to [0-9]
+
+    \D Matches any non-digit character, equivalent to [^0-9]
+
+    \w Matches any alphabet character, equivalent to [A-Za-z]
+
+    \W Matches any non-alphabet character, equivalent to [^A-Za-z] *)
 let rec extended_regex str =
   let multi_match =
     mult str
       (matching_strings (regexp "<[^\\|<\\|>\\|{\\|}]+>{[0-9]+}") str
       |> List.rev)
   in
-  multi_match
+  let word_group =
+    global_replace (regexp_string "\w") "[A-Za-z]" multi_match
+  in
+  let non_word_group =
+    global_replace (regexp_string "\W") "[^A-Za-z]" word_group
+  in
+  let digit_group =
+    global_replace (regexp_string "\d") "[0-9]" non_word_group
+  in
+  let non_digit_group =
+    global_replace (regexp_string "\D") "[^0-9]" digit_group
+  in
+  non_digit_group
 
 (** [mult str lst] replaces the first occurence of each string in [lst]
     from [str] with an OCaml Str regex representation of a string

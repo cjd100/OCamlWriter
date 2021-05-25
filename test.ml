@@ -356,6 +356,19 @@ let regex_tests =
       "Call Nope! for a free autoquote today! For inquiries with our \
        legal team, dial 786-123-4567"
       false true;
+    replace_test "Replace all alphabet characters with 1" "\\w" "1"
+      "Hello there number 9, 931923" "11111 11111 111111 9, 931923"
+      false false;
+    replace_test "Replace all non-alphabet characters with 1" "\\W" "1"
+      "Hello there number 9, 931923-?-"
+      "Hello1there1number1111111111111" false false;
+    replace_test "Replace all digit characters with hello" "\\d" "hello"
+      "Hello there number 9, 931923"
+      "Hello there number hello, hellohellohellohellohellohello" false
+      false;
+    replace_test "Replace all non-digit characters with no" "\\D" "no"
+      "Hello there number 9, 931923"
+      "nonononononononononononononononononono9nono931923" false false;
   ]
 
 let markdown_tests =
