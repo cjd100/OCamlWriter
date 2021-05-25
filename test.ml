@@ -66,9 +66,6 @@ let cmp_set_like_lists lst1 lst2 =
 
 let ex_json = Yojson.Basic.from_file "current_state.json"
 
-(*let json_to_file_test json = assert_equal (Yojson.Basic.from_file
-  "new_json.json") (File.json_to_file "new_json.json" ex_json)*)
-
 let gui_tests = []
 
 (* how to ensure this executes *)
@@ -78,9 +75,6 @@ let test_file1 =
 
 let file_open_test name result filename =
   name >:: fun _ -> assert_equal result (File.open_to_string filename)
-
-let file_tests =
-  [ (*file_open_test "open test_file_1" "test file 1!" "test_file_1"*) ]
 
 let encrypt_test name key plain cipher =
   name >:: fun _ ->
@@ -446,7 +440,6 @@ let suite =
   "test suite for MS1"
   >::: List.flatten
          [
-           file_tests;
            gui_tests;
            cipher_tests;
            word_tests;
