@@ -22,7 +22,15 @@
    making sure that newly implemented features work as expected, and
    that we have not broken any previously tested features. When
    possible, we try to write a test case that replicates any issues we
-   find during manual testing. *)
+   find during manual testing.
+
+   Cipher: OUnit, glass-box testing first, followed by randomize -------
+   Customize: Manual testing, black-box testing -------------------
+   File: Manual testing, black-box testing -----------------------------
+   Gui: Manual testing, black-box testing -----------------------------
+   Markdown: OUnit, glass-box testing, manual for file writing tests ---
+   Regex: OUnit, glass-box testing --------------------------------
+   Words: OUnit, glass-box testing -------------------------------- *)
 open OUnit2
 open QCheck
 open File
