@@ -22,7 +22,15 @@
    making sure that newly implemented features work as expected, and
    that we have not broken any previously tested features. When
    possible, we try to write a test case that replicates any issues we
-   find during manual testing. *)
+   find during manual testing.
+
+   Cipher: OUnit, glass-box testing first, followed by randomize -------
+   Customize: Manual testing, black-box testing -------------------
+   File: Manual testing, black-box testing -----------------------------
+   Gui: Manual testing, black-box testing -----------------------------
+   Markdown: OUnit, glass-box testing, manual for file writing tests ---
+   Regex: OUnit, glass-box testing --------------------------------
+   Words: OUnit, glass-box testing -------------------------------- *)
 open OUnit2
 open QCheck
 open File
@@ -58,9 +66,6 @@ let cmp_set_like_lists lst1 lst2 =
 
 let ex_json = Yojson.Basic.from_file "current_state.json"
 
-(*let json_to_file_test json = assert_equal (Yojson.Basic.from_file
-  "new_json.json") (File.json_to_file "new_json.json" ex_json)*)
-
 let gui_tests = []
 
 (* how to ensure this executes *)
@@ -70,9 +75,6 @@ let test_file1 =
 
 let file_open_test name result filename =
   name >:: fun _ -> assert_equal result (File.open_to_string filename)
-
-let file_tests =
-  [ (*file_open_test "open test_file_1" "test file 1!" "test_file_1"*) ]
 
 let encrypt_test name key plain cipher =
   name >:: fun _ ->
@@ -419,33 +421,38 @@ let markdown_tests =
        me";
     to_html_test "String containing no line breaks" '\n' "hello" "hello";
     to_html_test "String containing only one line break" '\n' "\nhello"
-      "<br>hello";
+      "<br>\nhello";
     to_html_test "String containing two line breaks" '\n' "\nhello\n"
-      "<br>hello<br>";
+      "<br>\nhello<br>\n";
     to_html_test
       "String containing two line breaks with words on left side" '\n'
-      "I want to say \nhello\n" "I want to say <br>hello<br>";
+      "I want to say \nhello\n" "I want to say <br>\nhello<br>\n";
     to_html_test
       "String containing two line breaks with words on right side" '\n'
-      "\nHello\n is what I said" "<br>Hello<br> is what I said";
+      "\nHello\n is what I said" "<br>\nHello<br>\n is what I said";
     to_html_test
       "String containing two line breaks with words on both sides" '\n'
       "I want to say \nhello\n to him"
-      "I want to say <br>hello<br> to him";
+      "I want to say <br>\nhello<br>\n to him";
     to_html_test "String containing three line breaks" '\n'
       "I want to say \nhello\n to him but he does not \nlike me"
-      "I want to say <br>hello<br> to him but he does not <br>like me";
+      "I want to say <br>\n\
+       hello<br>\n\
+      \ to him but he does not <br>\n\
+       like me";
     to_html_test "String containing four underscores" '\n'
       "I want to say \nhello\n to him but he does not \nlike\n me"
-      "I want to say <br>hello<br> to him but he does not <br>like<br> \
-       me";
+      "I want to say <br>\n\
+       hello<br>\n\
+      \ to him but he does not <br>\n\
+       like<br>\n\
+      \ me";
   ]
 
 let suite =
   "test suite for MS1"
   >::: List.flatten
          [
-           file_tests;
            gui_tests;
            cipher_tests;
            word_tests;
